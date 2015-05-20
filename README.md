@@ -1,4 +1,4 @@
-[<img src="https://travis-ci.org/tinify/tinify-ruby.svg?branch=master" alt="Build Status">](https://travis-ci.org/tinify/tinify-ruby)
+[<img src="https://travis-ci.org/tinify/tinify-php.svg?branch=master" alt="Build Status">](https://travis-ci.org/tinify/tinify-php)
 
 # Tinify API client for PHP
 
