@@ -18,9 +18,10 @@ class Client {
 
     function __construct($key, $app_identifier = NULL) {
         $this->options = array(
-            CURLOPT_USERPWD => "api:" . $key,
+            CURLOPT_BINARYTRANSFER => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
+            CURLOPT_USERPWD => "api:" . $key,
             CURLOPT_CAINFO => self::caBundle(),
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_USERAGENT => join(" ", array_filter(array(self::userAgent(), $app_identifier))),
@@ -28,17 +29,18 @@ class Client {
     }
 
     function request($method, $url, $body = NULL, $header = array()) {
-        if ($body) {
+        if (is_array($body)) {
             $body = json_encode($body);
-            $header["Content-Type"] = "application/json";
+            array_push($header, "Content-Type: application/json");
         }
 
         $request = curl_init();
-        $url = strtolower(substr($url, 0, 6)) == "https:" ? $url : Client::API_ENDPOINT . $url;
         curl_setopt_array($request, $this->options);
+
+        $url = strtolower(substr($url, 0, 6)) == "https:" ? $url : Client::API_ENDPOINT . $url;
         curl_setopt($request, CURLOPT_URL, $url);
-        curl_setopt($request, CURLOPT_POSTFIELDS, $body);
         curl_setopt($request, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($request, CURLOPT_POSTFIELDS, $body);
 
         $response = curl_exec($request);
 

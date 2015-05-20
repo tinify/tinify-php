@@ -17,7 +17,7 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/", array("hello" => "world"));
 
-        $this->assertEquals(array("Content-Type" => "application/json"), CurlMock::last(CURLOPT_HTTPHEADER));
+        $this->assertEquals(array("Content-Type: application/json"), CurlMock::last(CURLOPT_HTTPHEADER));
         $this->assertEquals('{"hello":"world"}', CurlMock::last(CURLOPT_POSTFIELDS));
     }
 
