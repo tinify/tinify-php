@@ -29,6 +29,6 @@
 
   "autoload": {
     "files": ["lib/Tinify.php", "lib/Tinify/Exception.php"],
-    "psr-4": {"Tinify\\": "lib/tinify/"}
+    "psr-4": {"Tinify\\": "lib/Tinify/"}
   }
 }
