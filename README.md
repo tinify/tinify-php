@@ -29,7 +29,7 @@ require_once("vendor/autoload.php");
 ## Usage
 
 ```php
-Tinify\setKey = "YOUR_API_KEY";
+Tinify\setKey("YOUR_API_KEY");
 Tinify\fromFile("unoptimized.png")->toFile("optimized.png");
 ```
 
