@@ -25,13 +25,13 @@ class Source {
     }
 
     public function store($options) {
-        $commands = array_merge($this->commands, array("store" => $options));
-        $response = (new self($this->url, $commands))->execute();
+        $response = Tinify::getClient()->request("post", $this->url,
+            array_merge($this->commands, array("store" => $options)));
         return new Result($response["headers"], $response["body"]);
     }
 
     public function result() {
-        $response = $this->execute();
+        $response = Tinify::getClient()->request("post", $this->url, $this->commands);
         return new Result($response["headers"], $response["body"]);
     }
 
@@ -41,9 +41,5 @@ class Source {
 
     public function toBuffer() {
         return $this->result()->toBuffer();
-    }
-
-    protected function execute() {
-        return Tinify::getClient()->request("post", $this->url, $this->commands);
     }
 }
