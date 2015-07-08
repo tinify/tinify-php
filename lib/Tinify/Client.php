@@ -56,6 +56,10 @@ class Client {
             $headers = self::parseHeaders(substr($response, 0, $headerSize));
             $body = substr($response, $headerSize);
 
+            if (isset($headers["compression-count"])) {
+                Tinify::$compressionCount = intval($headers["compression-count"]);
+            }
+
             if ($status >= 200 && $status <= 299) {
                 return array("body" => $body, "headers" => $headers);
             }
@@ -79,6 +83,7 @@ class Client {
 
         $res = array();
         foreach ($headers as $header) {
+            if (empty($header)) continue;
             $split = explode(":", $header, 2);
             if (count($split) === 2) {
                 $res[strtolower($split[0])] = trim($split[1]);

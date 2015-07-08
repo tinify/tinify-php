@@ -8,8 +8,8 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/");
 
-        $this->assertEquals("https://api.tinify.com/", CurlMock::last(CURLOPT_URL));
-        $this->assertEquals("api:key", CurlMock::last(CURLOPT_USERPWD));
+        $this->assertSame("https://api.tinify.com/", CurlMock::last(CURLOPT_URL));
+        $this->assertSame("api:key", CurlMock::last(CURLOPT_USERPWD));
     }
 
     public function testRequestWhenValidShouldIssueRequestWithJSONBody() {
@@ -17,8 +17,8 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/", array("hello" => "world"));
 
-        $this->assertEquals(array("Content-Type: application/json"), CurlMock::last(CURLOPT_HTTPHEADER));
-        $this->assertEquals('{"hello":"world"}', CurlMock::last(CURLOPT_POSTFIELDS));
+        $this->assertSame(array("Content-Type: application/json"), CurlMock::last(CURLOPT_HTTPHEADER));
+        $this->assertSame('{"hello":"world"}', CurlMock::last(CURLOPT_POSTFIELDS));
     }
 
     public function testRequestWhenValidShouldIssueRequestWithUserAgent() {
@@ -27,7 +27,17 @@ class TinifyClientTest extends TestCase {
         $client->request("get", "/");
 
         $curl = curl_version();
-        $this->assertEquals(Tinify\Client::userAgent(), CurlMock::last(CURLOPT_USERAGENT));
+        $this->assertSame(Tinify\Client::userAgent(), CurlMock::last(CURLOPT_USERAGENT));
+    }
+
+    public function testRequestWhenValidShouldUpdateCompressionCount() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200, "headers" => array("Compression-Count" => "12")
+        ));
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+
+        $this->assertSame(12, Tinify\compressionCount());
     }
 
     public function testRequestWhenValidWithAppIdShouldIssueRequestWithUserAgent() {
@@ -36,7 +46,7 @@ class TinifyClientTest extends TestCase {
         $client->request("get", "/");
 
         $curl = curl_version();
-        $this->assertEquals(Tinify\Client::userAgent() . " TestApp/0.1", CurlMock::last(CURLOPT_USERAGENT));
+        $this->assertSame(Tinify\Client::userAgent() . " TestApp/0.1", CurlMock::last(CURLOPT_USERAGENT));
     }
 
     public function testRequestWithUnexpectedErrorShouldThrowConnectionException() {

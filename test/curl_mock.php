@@ -9,8 +9,12 @@ class CurlMock {
     public $options = array();
     public $response;
 
-    public static function register($url, $response) {
-        self::$urls[$url] = $response;
+    public static function register($url, $request, $response = NULL) {
+        if (!$response) {
+            $response = $request;
+            $request = NULL;
+        }
+        self::$urls[$url] = array($request, $response);
     }
 
     public static function reset() {
@@ -29,7 +33,15 @@ class CurlMock {
     public function exec() {
         array_push(self::$requests, $this);
 
-        $this->response = self::$urls[$this->options[CURLOPT_URL]];
+        list($this->request, $this->response) = self::$urls[$this->options[CURLOPT_URL]];
+        if ($this->request) {
+            if ($this->request["body"]) {
+                if ($this->options[CURLOPT_POSTFIELDS] != $this->request["body"]) {
+                    throw new Exception("Body '" . $this->options[CURLOPT_POSTFIELDS] .
+                        "' does not match expected '" . $this->request["body"] . "'");
+                }
+            }
+        }
 
         if (isset($this->response["headers"])) {
             $headers = "";

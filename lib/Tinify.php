@@ -5,17 +5,11 @@ namespace Tinify;
 const VERSION = "0.9.0";
 
 class Tinify {
-    private static $key = NULL;
-    private static $appIdentifier = NULL;
+    public static $key = NULL;
+    public static $appIdentifier = NULL;
+    public static $compressionCount = NULL;
+
     private static $client = NULL;
-
-    public static function setKey($value) {
-        self::$key = $value;
-    }
-
-    public static function setAppIdentifier($value) {
-        self::$appIdentifier = $value;
-    }
 
     public static function reset() {
         self::$key = NULL;
@@ -23,25 +17,42 @@ class Tinify {
     }
 
     public static function getClient() {
+        if (!self::$key) {
+            throw new AccountException("Provide an API key with Tinify.key = ...");
+        }
+
         if (!self::$client) {
             self::$client = new Client(self::$key);
         }
+
         return self::$client;
     }
 }
 
 function setKey($key) {
-    Tinify::setKey($key);
+    Tinify::$key = $key;
 }
 
-function setAppIdentifier($key) {
-    Tinify::setAppIdentifier($key);
+function setAppIdentifier($appIdentifier) {
+    Tinify::$appIdentifier = $appIdentifier;
 }
 
 function fromFile($path) {
-    return Image::fromFile($path);
+    return Source::fromFile($path);
 }
 
 function fromBuffer($string) {
-    return Image::fromBuffer($string);
+    return Source::fromBuffer($string);
+}
+
+function validate() {
+    try {
+        Tinify::getClient()->request("post", "/shrink");
+    } catch (ClientException $e) {
+        return true;
+    }
+}
+
+function compressionCount() {
+    return Tinify::$compressionCount;
 }
