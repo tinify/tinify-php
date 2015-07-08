@@ -1,16 +1,21 @@
 {
   "name": "tinify/tinify",
-  "description": "Tinify compresses your images intelligently. Read more at https://tinify.com.",
+  "description": "PHP client for the Tinify API. Tinify compresses your images intelligently. Read more at https://tinify.com.",
   "keywords": [
     "tinify",
     "tinypng",
     "tinyjpg",
     "compress",
+    "images",
     "api"
   ],
 
   "homepage": "https://tinify.com/developers",
   "license": "MIT",
+
+  "support": {
+    "email": "support@tinify.com"
+  },
 
   "authors": [{
     "name": "Rolf Timmermans",
