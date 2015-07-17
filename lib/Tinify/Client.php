@@ -66,13 +66,16 @@ class Client {
 
             $details = json_decode($body);
             if (!$details) {
+                $message = sprintf("Error while parsing response: %s (#%d)",
+                    PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
+                    json_last_error());
                 $details = (object) array(
-                    "message" => "Error while parsing response: error #" . json_last_error(),
+                    "message" => $message,
                     "error" => "ParseError"
                 );
             }
 
-            throw Exception::create($details->{"message"}, $details->{"error"}, $status);
+            throw Exception::create($details->message, $details->error, $status);
         }
     }
 
