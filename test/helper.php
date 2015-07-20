@@ -5,7 +5,7 @@ require_once("vendor/autoload.php");
 
 class TestCase extends \PHPUnit_Framework_TestCase {
     function setUp() {
-        Tinify\Tinify::reset();
+        Tinify\setKey(NULL);
     }
 
     function tearDown() {

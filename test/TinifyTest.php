@@ -21,15 +21,6 @@ class ClientTest extends TestCase {
         $this->assertSame("api:fghij", CurlMock::last(CURLOPT_USERPWD));
     }
 
-    public function testResetShouldResetKey() {
-        Tinify\setKey("abcde");
-        Tinify\Tinify::reset();
-
-        $prop = new ReflectionProperty("Tinify\Tinify", "key");
-        $prop->setAccessible(true);
-        $this->assertSame(NULL, $prop->getValue());
-    }
-
     public function testClientWithKeyShouldReturnClient() {
         Tinify\setKey("abcde");
         $this->assertInstanceOf("Tinify\Client", Tinify\Tinify::getClient());

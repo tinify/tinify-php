@@ -11,11 +11,6 @@ class Tinify {
 
     public static $client = NULL;
 
-    public static function reset() {
-        self::$key = NULL;
-        self::$client = NULL;
-    }
-
     public static function getClient() {
         if (!self::$key) {
             throw new AccountException("Provide an API key with Tinify.key = ...");
