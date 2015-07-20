@@ -100,8 +100,13 @@ class TinifyClientTest extends TestCase {
         CurlMock::register("https://api.tinify.com/", array(
             "status" => 543, "body" => '<!-- this is not json -->'
         ));
-        $this->setExpectedExceptionRegExp("Tinify\ServerException",
-            "/Error while parsing response: error #4 \(HTTP 543\/ParseError\)/");
+        if (PHP_VERSION_ID >= 50500) {
+            $this->setExpectedExceptionRegExp("Tinify\ServerException",
+                "/Error while parsing response: Syntax error \(#4\) \(HTTP 543\/ParseError\)/");
+        } else {
+            $this->setExpectedExceptionRegExp("Tinify\ServerException",
+                "/Error while parsing response: Error \(#4\) \(HTTP 543\/ParseError\)/");
+        }
         $client = new Tinify\Client("key");
         $client->request("get", "/");
     }
