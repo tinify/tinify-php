@@ -9,7 +9,7 @@ class Tinify {
     public static $appIdentifier = NULL;
     public static $compressionCount = NULL;
 
-    private static $client = NULL;
+    public static $client = NULL;
 
     public static function reset() {
         self::$key = NULL;
@@ -31,6 +31,7 @@ class Tinify {
 
 function setKey($key) {
     Tinify::$key = $key;
+    Tinify::$client = NULL;
 }
 
 function setAppIdentifier($appIdentifier) {

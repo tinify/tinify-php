@@ -10,6 +10,17 @@ class ClientTest extends TestCase {
         $this->dummyFile = __DIR__ . "/examples/dummy.png";
     }
 
+    public function testKeyShouldResetClientWithNewKey() {
+        CurlMock::register("https://api.tinify.com/", array("status" => 200));
+        Tinify\setKey("abcde");
+        Tinify\Tinify::getClient();
+        Tinify\setKey("fghij");
+        $client = Tinify\Tinify::getClient();
+        $client->request("get", "/");
+
+        $this->assertSame("api:fghij", CurlMock::last(CURLOPT_USERPWD));
+    }
+
     public function testResetShouldResetKey() {
         Tinify\setKey("abcde");
         Tinify\Tinify::reset();
