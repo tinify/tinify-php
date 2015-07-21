@@ -2,12 +2,16 @@
 
 namespace Tinify;
 
+class CurlMockException extends Exception {
+}
+
 class CurlMock {
     private static $urls = array();
     private static $requests = array();
 
     public $options = array();
     public $response;
+    public $closed = false;
 
     public static function register($url, $request, $response = NULL) {
         if (!$response) {
@@ -30,7 +34,14 @@ class CurlMock {
         }
     }
 
+    public function close() {
+        $this->closed = true;
+    }
+
     public function exec() {
+        if ($this->closed) {
+            throw new CurlMockException("Curl already closed");
+        }
         array_push(self::$requests, $this);
 
         list($this->request, $this->response) = self::$urls[$this->options[CURLOPT_URL]];
@@ -65,16 +76,25 @@ class CurlMock {
     }
 
     public function setopt_array($array) {
+        if ($this->closed) {
+            throw new CurlMockException("Curl already closed");
+        }
         foreach ($array as $key => $value) {
             $this->options[$key] = $value;
         }
     }
 
     public function setopt($key, $value) {
+        if ($this->closed) {
+            throw new CurlMockException("Curl already closed");
+        }
         $this->options[$key] = $value;
     }
 
     public function getinfo($key) {
+        if ($this->closed) {
+            throw new CurlMockException("Curl already closed");
+        }
         switch ($key) {
             case CURLINFO_HTTP_CODE:
                 return isset($this->response["status"]) ? $this->response["status"] : 0;
@@ -86,10 +106,16 @@ class CurlMock {
     }
 
     public function error() {
+        if ($this->closed) {
+            throw new CurlMockException("Curl already closed");
+        }
         return $this->response["error"];
     }
 
     public function errno() {
+        if ($this->closed) {
+            throw new CurlMockException("Curl already closed");
+        }
         return $this->response["errno"];
     }
 }
@@ -103,6 +129,7 @@ function curl_exec($mock) {
 }
 
 function curl_close($mock) {
+    $mock->close();
 }
 
 function curl_setopt_array($mock, $array) {
