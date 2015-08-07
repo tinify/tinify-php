@@ -23,8 +23,8 @@ class TinifyResultTest extends TestCase {
         $this->assertSame("image/png", $result->contentType());
     }
 
-    public function testWithMetaAndDataDataShouldReturnImageData() {
+    public function testWithMetaAndDataToBufferShouldReturnImageData() {
         $result = new Tinify\Result(array(), "image data");
-        $this->assertSame("image data", $result->data());
+        $this->assertSame("image data", $result->toBuffer());
     }
 }
