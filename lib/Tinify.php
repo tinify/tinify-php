@@ -17,7 +17,7 @@ class Tinify {
         }
 
         if (!self::$client) {
-            self::$client = new Client(self::$key);
+            self::$client = new Client(self::$key, self::$appIdentifier);
         }
 
         return self::$client;
@@ -31,6 +31,7 @@ function setKey($key) {
 
 function setAppIdentifier($appIdentifier) {
     Tinify::$appIdentifier = $appIdentifier;
+    Tinify::$client = NULL;
 }
 
 function fromFile($path) {
