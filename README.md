@@ -33,6 +33,13 @@ Tinify\setKey("YOUR_API_KEY");
 Tinify\fromFile("unoptimized.png")->toFile("optimized.png");
 ```
 
+## Running tests
+
+```
+composer install
+vendor/bin/phpunit
+```
+
 ## License
 
 This software is licensed under the MIT License. [View the license](LICENSE).
