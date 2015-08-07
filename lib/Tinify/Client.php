@@ -45,8 +45,8 @@ class Client {
         $response = curl_exec($request);
 
         if ($response === false) {
-            curl_close($request);
             $message = sprintf("%s (#%d)", curl_error($request), curl_errno($request));
+            curl_close($request);
             throw new ConnectionException("Error while connecting: " . $message);
         } else {
             $status = curl_getinfo($request, CURLINFO_HTTP_CODE);
