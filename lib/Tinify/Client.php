@@ -30,8 +30,12 @@ class Client {
 
     function request($method, $url, $body = NULL, $header = array()) {
         if (is_array($body)) {
-            $body = json_encode($body);
-            array_push($header, "Content-Type: application/json");
+            if (!empty($body)) {
+                $body = json_encode($body);
+                array_push($header, "Content-Type: application/json");
+            } else {
+                $body = NULL;
+            }
         }
 
         $request = curl_init();
