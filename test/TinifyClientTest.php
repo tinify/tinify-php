@@ -45,7 +45,7 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/");
 
-        $this->assertSame(12, Tinify\compressionCount());
+        $this->assertSame(12, Tinify\getCompressionCount());
     }
 
     public function testRequestWhenValidWithAppIdShouldIssueRequestWithUserAgent() {

@@ -5,15 +5,32 @@ namespace Tinify;
 const VERSION = "0.9.1";
 
 class Tinify {
-    public static $key = NULL;
-    public static $appIdentifier = NULL;
-    public static $compressionCount = NULL;
+    private static $key = NULL;
+    private static $appIdentifier = NULL;
+    private static $compressionCount = NULL;
+    private static $client = NULL;
 
-    public static $client = NULL;
+    public static function setKey($key) {
+        self::$key = $key;
+        self::$client = NULL;
+    }
+
+    public static function setAppIdentifier($appIdentifier) {
+        self::$appIdentifier = $appIdentifier;
+        self::$client = NULL;
+    }
+
+    public static function getCompressionCount() {
+        return self::$compressionCount;
+    }
+
+    public static function setCompressionCount($compressionCount) {
+        self::$compressionCount = $compressionCount;
+    }
 
     public static function getClient() {
         if (!self::$key) {
-            throw new AccountException("Provide an API key with Tinify.key = ...");
+            throw new AccountException("Provide an API key with Tinify\setKey(...)");
         }
 
         if (!self::$client) {
@@ -25,13 +42,19 @@ class Tinify {
 }
 
 function setKey($key) {
-    Tinify::$key = $key;
-    Tinify::$client = NULL;
+    return Tinify::setKey($key);
 }
 
 function setAppIdentifier($appIdentifier) {
-    Tinify::$appIdentifier = $appIdentifier;
-    Tinify::$client = NULL;
+    return Tinify::setAppIdentifier($appIdentifier);
+}
+
+function getCompressionCount() {
+    return Tinify::getCompressionCount();
+}
+
+function compressionCount() {
+    return Tinify::getCompressionCount();
 }
 
 function fromFile($path) {
@@ -48,8 +71,4 @@ function validate() {
     } catch (ClientException $e) {
         return true;
     }
-}
-
-function compressionCount() {
-    return Tinify::$compressionCount;
 }

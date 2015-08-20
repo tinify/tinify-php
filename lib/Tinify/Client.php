@@ -61,7 +61,7 @@ class Client {
             $body = substr($response, $headerSize);
 
             if (isset($headers["compression-count"])) {
-                Tinify::$compressionCount = intval($headers["compression-count"]);
+                Tinify::setCompressionCount(intval($headers["compression-count"]));
             }
 
             if ($status >= 200 && $status <= 299) {
