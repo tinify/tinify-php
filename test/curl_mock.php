@@ -68,7 +68,9 @@ class CurlMock {
             $this->response["body"] = "";
         }
 
-        if (isset($this->response["status"])) {
+        if (array_key_exists("return", $this->response)) {
+            return $this->response["return"];
+        } else if (isset($this->response["status"])) {
             return $this->response["headers"] . $this->response["body"];
         } else {
             return false;
