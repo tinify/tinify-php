@@ -76,6 +76,15 @@ class TinifyClientTest extends TestCase {
         $client->request("get", "/");
     }
 
+    public function testRequestWithCurlErrorShouldThrowConnectionError() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "errno" => 0, "error" => "", "return" => null
+        ));
+        $this->setExpectedException("Tinify\ConnectionException");
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+    }
+
     public function testRequestWithServerErrorShouldThrowServerException() {
         CurlMock::register("https://api.tinify.com/", array(
             "status" => 584, "body" => '{"error":"InternalServerError","message":"Oops!"}'
