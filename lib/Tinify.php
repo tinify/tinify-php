@@ -2,7 +2,7 @@
 
 namespace Tinify;
 
-const VERSION = "0.9.1";
+const VERSION = "1.1.0";
 
 class Tinify {
     private static $key = NULL;
