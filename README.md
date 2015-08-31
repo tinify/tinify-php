@@ -2,6 +2,12 @@
 
 # Tinify API client for PHP
 
+PHP client for the Tinify API. Tinify compresses your images intelligently. Read more at https://tinify.com.
+
+## Documentation
+
+[Go to the documentation for the PHP client](https://tinypng.com/developers/reference/php).
+
 ## Installation
 
 Install the API client with Composer. Add this to your `composer.json`:
