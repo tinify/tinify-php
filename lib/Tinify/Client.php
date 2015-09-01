@@ -32,11 +32,12 @@ class Client {
         if (is_array($body)) {
             if (!empty($body)) {
                 $body = json_encode($body);
-                array_push($header, "Content-Type: application/json");
             } else {
                 $body = NULL;
             }
         }
+        
+        array_push($header, "Content-Type: application/json");
 
         $request = curl_init();
         curl_setopt_array($request, $this->options);
