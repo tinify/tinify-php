@@ -17,7 +17,7 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/", array());
 
-        $this->assertNull(CurlMock::last(CURLOPT_POSTFIELDS));
+        $this->assertFalse(CurlMock::last_has(CURLOPT_POSTFIELDS));
     }
 
     public function testRequestWhenValidShouldIssueRequestWithJSONBody() {

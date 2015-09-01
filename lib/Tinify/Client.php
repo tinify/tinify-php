@@ -44,7 +44,11 @@ class Client {
         $url = strtolower(substr($url, 0, 6)) == "https:" ? $url : Client::API_ENDPOINT . $url;
         curl_setopt($request, CURLOPT_URL, $url);
         curl_setopt($request, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($request, CURLOPT_POSTFIELDS, $body);
+        curl_setopt($request, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+
+        if ($body) {
+            curl_setopt($request, CURLOPT_POSTFIELDS, $body);
+        }
 
         $response = curl_exec($request);
 
