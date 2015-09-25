@@ -15,7 +15,7 @@ matrix:
   include:
   - php: 5.6
     env: INTEGRATION_TESTS=true
-    script: vendor/bin/phpunit --no-configuration test/integration.php
+    script: "[ \"$TRAVIS_PULL_REQUEST\" == \"false\" ] && vendor/bin/phpunit --no-configuration test/integration.php"
 before_script: composer install
 script: vendor/bin/phpunit
 notifications:

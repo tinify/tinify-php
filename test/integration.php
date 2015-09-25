@@ -1,9 +1,5 @@
 <?php
 
-if (getenv("TRAVIS_PULL_REQUEST") && getenv("TRAVIS_PULL_REQUEST") != "false") {
-    exit(0);
-}
-
 if (!getenv("TINIFY_KEY")) {
     exit("Set the TINIFY_KEY environment variable.\n");
 }
