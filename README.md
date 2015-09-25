@@ -46,6 +46,13 @@ composer install
 vendor/bin/phpunit
 ```
 
+### Integration tests
+
+```
+composer install
+TINIFY_KEY=$YOUR_API_KEY vendor/bin/phpunit --no-configuration test/integration.php
+```
+
 ## License
 
 This software is licensed under the MIT License. [View the license](LICENSE).
