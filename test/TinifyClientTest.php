@@ -20,6 +20,14 @@ class TinifyClientTest extends TestCase {
         $this->assertFalse(CurlMock::last_has(CURLOPT_POSTFIELDS));
     }
 
+    public function testRequestWhenValidShouldIssueRequestWithoutContentTypeWhenOptionsAreEmpty() {
+        CurlMock::register("https://api.tinify.com/", array("status" => 200));
+        $client = new Tinify\Client("key");
+        $client->request("get", "/", array());
+
+        $this->assertSame(array(), CurlMock::last(CURLOPT_HTTPHEADER));
+    }
+
     public function testRequestWhenValidShouldIssueRequestWithJSONBody() {
         CurlMock::register("https://api.tinify.com/", array("status" => 200));
         $client = new Tinify\Client("key");
