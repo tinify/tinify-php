@@ -2,7 +2,7 @@
 
 namespace Tinify;
 
-const VERSION = "1.1.1";
+const VERSION = "1.2.0";
 
 class Tinify {
     private static $key = NULL;
@@ -63,6 +63,10 @@ function fromFile($path) {
 
 function fromBuffer($string) {
     return Source::fromBuffer($string);
+}
+
+function fromUrl($string) {
+    return Source::fromUrl($string);
 }
 
 function validate() {

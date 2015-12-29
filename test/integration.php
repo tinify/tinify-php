@@ -14,7 +14,7 @@ class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
         self::$optimized = \Tinify\fromFile($unoptimizedPath);
     }
 
-    public function testShouldCompress() {
+    public function testShouldCompressFromFile() {
         $path = tempnam(sys_get_temp_dir(), "tinify-php");
         self::$optimized->toFile($path);
         $this->assertGreaterThan(0, filesize($path));
@@ -26,5 +26,13 @@ class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
         self::$optimized->resize(array("method" => "fit", "width" => 50, "height" => 20))->toFile($path);
         $this->assertGreaterThan(0, filesize($path));
         $this->assertLessThan(800, filesize($path));
+    }
+
+    public function testShouldCompressFromUrl() {
+        $path = tempnam(sys_get_temp_dir(), "tinify-php");
+        $optimized = \Tinify\fromUrl("https://raw.githubusercontent.com/tinify/tinify-ruby/master/test/examples/voormedia.png");
+        $optimized->toFile($path);
+        $this->assertGreaterThan(0, filesize($path));
+        $this->assertLessThan(1500, filesize($path));
     }
 }

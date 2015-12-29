@@ -75,4 +75,12 @@ class ClientTest extends TestCase {
         Tinify\setKey("valid");
         $this->assertInstanceOf("Tinify\Source", Tinify\fromBuffer("png file"));
     }
+
+    public function testFromUrlShouldReturnSource() {
+        CurlMock::register("https://api.tinify.com/shrink", array(
+            "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
+        ));
+        Tinify\setKey("valid");
+        $this->assertInstanceOf("Tinify\Source", Tinify\fromUrl("http://example.com/test.jpg"));
+    }
 }
