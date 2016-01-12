@@ -14,6 +14,12 @@ class Source {
         return new self($response["headers"]["location"]);
     }
 
+    public static function fromUrl($url) {
+        $body = array("source" => array("url" => $url));
+        $response = Tinify::getClient()->request("post", "/shrink", $body);
+        return new self($response["headers"]["location"]);
+    }
+
     public function __construct($url, $commands = array()) {
         $this->url = $url;
         $this->commands = $commands;
