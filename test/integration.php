@@ -30,7 +30,7 @@ class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
 
     public function testShouldCompressFromUrl() {
         $path = tempnam(sys_get_temp_dir(), "tinify-php");
-        $optimized = \Tinify\fromUrl("https://raw.githubusercontent.com/tinify/tinify-ruby/master/test/examples/voormedia.png");
+        $optimized = \Tinify\fromUrl("https://raw.githubusercontent.com/tinify/tinify-php/master/test/examples/voormedia.png");
         $optimized->toFile($path);
         $this->assertGreaterThan(0, filesize($path));
         $this->assertLessThan(1500, filesize($path));

@@ -12,7 +12,7 @@ class TinifySourceTest extends TestCase {
 
     public function testWithInvalidApiKeyFromFileShouldThrowAccountException() {
         CurlMock::register("https://api.tinify.com/shrink", array(
-            "status" => 401, "body" => '{"error":"Unauthorized","message":"Oops!"}'
+            "status" => 401, "body" => '{"error":"Unauthorized","message":"Credentials are invalid"}'
         ));
         Tinify\setKey("invalid");
 
@@ -22,7 +22,7 @@ class TinifySourceTest extends TestCase {
 
     public function testWithInvalidApiKeyFromBufferShouldThrowAccountException() {
         CurlMock::register("https://api.tinify.com/shrink", array(
-            "status" => 401, "body" => '{"error":"Unauthorized","message":"Oops!"}'
+            "status" => 401, "body" => '{"error":"Unauthorized","message":"Credentials are invalid"}'
         ));
         Tinify\setKey("invalid");
 
@@ -32,7 +32,7 @@ class TinifySourceTest extends TestCase {
 
     public function testWithInvalidApiKeyFromUrlShouldThrowAccountException() {
         CurlMock::register("https://api.tinify.com/shrink", array(
-            "status" => 401, "body" => '{"error":"Unauthorized","message":"Oops!"}'
+            "status" => 401, "body" => '{"error":"Unauthorized","message":"Credentials are invalid"}'
         ));
         Tinify\setKey("invalid");
 
@@ -40,7 +40,7 @@ class TinifySourceTest extends TestCase {
         Tinify\Source::fromUrl("http://example.com/test.jpg");
     }
 
-    public function testFromFileShouldReturnSource() {
+    public function testWithValidApiKeyFromFileShouldReturnSource() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
@@ -48,7 +48,7 @@ class TinifySourceTest extends TestCase {
         $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromFile($this->dummyFile));
     }
 
-    public function testFromFileShouldReturnSourceWithData() {
+    public function testWithValidApiKeyFromFileShouldReturnSourceWithData() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
@@ -59,7 +59,7 @@ class TinifySourceTest extends TestCase {
         $this->assertSame("compressed file", Tinify\Source::fromFile($this->dummyFile)->toBuffer());
     }
 
-    public function testFromBufferShouldReturnSource() {
+    public function testWithValidApiKeyFromBufferShouldReturnSource() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
@@ -67,7 +67,7 @@ class TinifySourceTest extends TestCase {
         $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromBuffer("png file"));
     }
 
-    public function testFromBufferShouldReturnSourceWithData() {
+    public function testWithValidApiKeyFromBufferShouldReturnSourceWithData() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
@@ -78,15 +78,15 @@ class TinifySourceTest extends TestCase {
         $this->assertSame("compressed file", Tinify\Source::fromBuffer("png file")->toBuffer());
     }
 
-    public function testFromUrlShouldReturnSource() {
+    public function testWithValidApiKeyFromUrlShouldReturnSource() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
         Tinify\setKey("valid");
-        $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromUrl("http://example.com/test.jpg"));
+        $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromUrl("http://example.com/testWithValidApiKey.jpg"));
     }
 
-    public function testFromUrlShouldReturnSourceWithData() {
+    public function testWithValidApiKeyFromUrlShouldReturnSourceWithData() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
@@ -94,20 +94,20 @@ class TinifySourceTest extends TestCase {
             "status" => 200, "body" => "compressed file"
         ));
         Tinify\setKey("valid");
-        $this->assertSame("compressed file", Tinify\Source::fromUrl("http://example.com/test.jpg")->toBuffer());
+        $this->assertSame("compressed file", Tinify\Source::fromUrl("http://example.com/testWithValidApiKey.jpg")->toBuffer());
     }
 
-    public function testFromUrlShouldThrowExceptionIfRequestIsNotOK() {
+    public function testWithValidApiKeyFromUrlShouldThrowExceptionIfRequestIsNotOK() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 400, "body" => '{"error":"Source not found","message":"Cannot parse URL"}'
         ));
-        Tinify\setKey("invalid");
+        Tinify\setKey("valid");
 
         $this->setExpectedException("Tinify\ClientException");
         Tinify\Source::fromUrl("file://wrong");
     }
 
-    public function testResultShouldReturnResult() {
+    public function testWithValidApiKeyResultShouldReturnResult() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201,
             "headers" => array("Location" => "https://api.tinify.com/some/location"),
@@ -117,7 +117,7 @@ class TinifySourceTest extends TestCase {
         $this->assertInstanceOf("Tinify\Result", Tinify\Source::fromBuffer("png file")->result());
     }
 
-    public function testResizeShouldReturnSource() {
+    public function testWithValidApiKeyResizeShouldReturnSource() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
@@ -128,7 +128,7 @@ class TinifySourceTest extends TestCase {
         $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromBuffer("png file")->resize(array("width" => 400)));
     }
 
-    public function testResizeShouldReturnSourceWithData() {
+    public function testWithValidApiKeyResizeShouldReturnSourceWithData() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
@@ -139,7 +139,7 @@ class TinifySourceTest extends TestCase {
         $this->assertSame("small file", Tinify\Source::fromBuffer("png file")->resize(array("width" => 400))->toBuffer());
     }
 
-    public function testStoreShouldReturnResultMeta() {
+    public function testWithValidApiKeyStoreShouldReturnResultMeta() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201,
             "headers" => array("Location" => "https://api.tinify.com/some/location"),
@@ -154,7 +154,7 @@ class TinifySourceTest extends TestCase {
         $this->assertInstanceOf("Tinify\Result", Tinify\Source::fromBuffer("png file")->store($options));
     }
 
-    public function testStoreShouldReturnResultMetaWithLocation() {
+    public function testWithValidApiKeyStoreShouldReturnResultMetaWithLocation() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201,
             "headers" => array("Location" => "https://api.tinify.com/some/location"),
@@ -172,7 +172,7 @@ class TinifySourceTest extends TestCase {
         $this->assertSame("https://bucket.s3.amazonaws.com/example", $location);
     }
 
-    public function testStoreShouldMergeCommands() {
+    public function testWithValidApiKeyStoreShouldMergeCommands() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201,
             "headers" => array("Location" => "https://api.tinify.com/some/location"),
@@ -187,7 +187,7 @@ class TinifySourceTest extends TestCase {
         $this->assertInstanceOf("Tinify\Result", Tinify\Source::fromBuffer("png file")->resize(array("width" => 300))->store($options));
     }
 
-    public function testToBufferShouldReturnImageData() {
+    public function testWithValidApiKeyToBufferShouldReturnImageData() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
@@ -199,7 +199,7 @@ class TinifySourceTest extends TestCase {
         $this->assertSame("compressed file", Tinify\Source::fromBuffer("png file")->toBuffer());
     }
 
-    public function testToFileShouldStoreImageData() {
+    public function testWithValidApiKeyToFileShouldStoreImageData() {
         CurlMock::register("https://api.tinify.com/shrink", array(
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
