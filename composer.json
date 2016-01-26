@@ -30,6 +30,7 @@
   },
 
   "require-dev": {
+    "symfony/yaml": "~2.0",
     "phpunit/phpunit": "~4.0"
   },
 
