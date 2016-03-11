@@ -33,4 +33,8 @@ class Result extends ResultMeta {
     public function contentType() {
         return $this->mediaType();
     }
+    
+    public function compressionCount() {
+        return $this->meta['compression-count'];
+    }
 }
