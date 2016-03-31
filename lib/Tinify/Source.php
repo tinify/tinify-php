@@ -25,6 +25,12 @@ class Source {
         $this->commands = $commands;
     }
 
+    public function preserve() {
+        $options = $this->flatten(func_get_args());
+        $commands = array_merge($this->commands, array("preserve" => $options));
+        return new self($this->url, $commands);
+    }
+
     public function resize($options) {
         $commands = array_merge($this->commands, array("resize" => $options));
         return new self($this->url, $commands);
@@ -47,5 +53,17 @@ class Source {
 
     public function toBuffer() {
         return $this->result()->toBuffer();
+    }
+
+    private static function flatten($options) {
+        $flattened = array();
+        foreach ($options as $option) {
+            if (is_array($option)) {
+                $flattened = array_merge($flattened, $option);
+            } else {
+                array_push($flattened, $option);
+            }
+        }
+        return $flattened;
     }
 }
