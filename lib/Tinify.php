@@ -72,7 +72,10 @@ function fromUrl($string) {
 function validate() {
     try {
         Tinify::getClient()->request("post", "/shrink");
-    } catch (ClientException $e) {
+    } catch (AccountException $err) {
+        if ($err->status == 429) return true;
+        throw $err;
+    } catch (ClientException $err) {
         return true;
     }
 }
