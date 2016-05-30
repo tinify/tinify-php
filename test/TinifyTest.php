@@ -10,6 +10,45 @@ class ClientTest extends TestCase {
         $this->dummyFile = __DIR__ . "/examples/dummy.png";
     }
 
+    public function testGetKeyWithoutKeyShouldReturnNull() {
+        $this->assertSame(NULL, Tinify\getKey());
+    }
+
+    public function testGetKeyWithKeyShouldReturnKey() {
+        Tinify\setKey("abcde");
+        $this->assertSame("abcde", Tinify\getKey());
+    }
+
+    public function testCreateKeyWithNewEmailShouldSetKey() {
+        CurlMock::register("https://api.tinify.com/keys", array(
+            "status" => 202,
+            "body" => '{"key":"abcdefg123"}',
+            "headers" => array("Content-Type" => "application/json"),
+        ));
+
+        Tinify\createKey("user@example.com", array(
+            "name" => "John",
+            "identifier" => "My Tinify plugin",
+            "link" => "https://mywebsite.example.com/admin/settings",
+        ));
+
+        $this->assertSame("abcdefg123", Tinify\getKey());
+    }
+
+    public function testCreateKeyWithDuplicateEmailShouldThrowClientException() {
+        CurlMock::register("https://api.tinify.com/keys", array(
+            "status" => 403,
+            "body" => '{"error":"Duplicate registration","message":"This email address has already been used"}',
+        ));
+
+        $this->setExpectedException("Tinify\AccountException");
+        Tinify\createKey("user@example.com", array(
+            "name" => "John",
+            "identifier" => "My Tinify plugin",
+            "link" => "https://mywebsite.example.com/admin/settings",
+        ));
+    }
+
     public function testKeyShouldResetClientWithNewKey() {
         CurlMock::register("https://api.tinify.com/", array("status" => 200));
         Tinify\setKey("abcde");

@@ -16,15 +16,16 @@ class Client {
         return __DIR__ . "/../data/cacert.pem";
     }
 
-    function __construct($key, $app_identifier = NULL) {
+    function __construct($key, $appIdentifier = NULL) {
+        $userAgent = join(" ", array_filter(array(self::userAgent(), $appIdentifier)));
         $this->options = array(
             CURLOPT_BINARYTRANSFER => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
-            CURLOPT_USERPWD => "api:" . $key,
+            CURLOPT_USERPWD => $key ? ("api:" . $key) : NULL,
             CURLOPT_CAINFO => self::caBundle(),
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_USERAGENT => join(" ", array_filter(array(self::userAgent(), $app_identifier))),
+            CURLOPT_USERAGENT => $userAgent,
         );
     }
 
@@ -64,22 +65,34 @@ class Client {
                 Tinify::setCompressionCount(intval($headers["compression-count"]));
             }
 
-            if ($status >= 200 && $status <= 299) {
-                return array("body" => $body, "headers" => $headers);
+            $isJson = false;
+            if (isset($headers["content-type"])) {
+                /* Parse JSON response bodies. */
+                list($contentType) = explode(";", $headers["content-type"], 2);
+                if (strtolower(trim($contentType)) == "application/json") {
+                    $isJson = true;
+                }
             }
 
-            $details = json_decode($body);
-            if (!$details) {
-                $message = sprintf("Error while parsing response: %s (#%d)",
-                    PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
-                    json_last_error());
-                $details = (object) array(
-                    "message" => $message,
-                    "error" => "ParseError"
-                );
+            /* 1xx and 3xx are unexpected and will be treated as error. */
+            $isError = $status <= 199 || $status >= 300;
+
+            if ($isJson || $isError) {
+                /* Parse JSON bodies, always interpret errors as JSON. */
+                $body = json_decode($body);
+                if (!$body) {
+                    $message = sprintf("Error while parsing response: %s (#%d)",
+                        PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
+                        json_last_error());
+                    throw Exception::create($message, "ParseError", $status);
+                }
             }
 
-            throw Exception::create($details->message, $details->error, $status);
+            if ($isError) {
+                throw Exception::create($body->message, $body->error, $status);
+            }
+
+            return (object) array("body" => $body, "headers" => $headers);
         } else {
             $message = sprintf("%s (#%d)", curl_error($request), curl_errno($request));
             curl_close($request);
@@ -92,14 +105,14 @@ class Client {
             $headers = explode("\r\n", $headers);
         }
 
-        $res = array();
+        $result = array();
         foreach ($headers as $header) {
             if (empty($header)) continue;
             $split = explode(":", $header, 2);
             if (count($split) === 2) {
-                $res[strtolower($split[0])] = trim($split[1]);
+                $result[strtolower($split[0])] = trim($split[1]);
             }
         }
-        return $res;
+        return $result;
     }
 }

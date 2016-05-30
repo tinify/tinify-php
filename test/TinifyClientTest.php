@@ -65,6 +65,47 @@ class TinifyClientTest extends TestCase {
         $this->assertSame(Tinify\Client::userAgent() . " TestApp/0.1", CurlMock::last(CURLOPT_USERAGENT));
     }
 
+    public function testRequestWhenValidShouldParseJSONBody() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200,
+            "body" => '{"hello":"world"}',
+            "headers" => array("Content-Type" => "application/JSON; charset=utf-8")
+        ));
+        $client = new Tinify\Client("key");
+        $response = $client->request("post", "/");
+
+        $this->assertEquals((object) array("hello" => "world"), $response->body);
+    }
+
+    public function testRequestWhenValidShouldNotParseBinaryBody() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200,
+            "body" => "binary body",
+            "headers" => array("Content-Type" => "image/png")
+        ));
+        $client = new Tinify\Client("key");
+        $response = $client->request("post", "/");
+
+        $this->assertSame("binary body", $response->body);
+    }
+
+    public function testRequestWithBadJSONBodyThrowExceptionWithMessage() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200,
+            "body" => '<!-- this is not json -->',
+            "headers" => array("Content-Type" => "application/JSON"),
+        ));
+        if (PHP_VERSION_ID >= 50500) {
+            $this->setExpectedExceptionRegExp("Tinify\Exception",
+                "/Error while parsing response: Syntax error \(#4\) \(HTTP 200\/ParseError\)/");
+        } else {
+            $this->setExpectedExceptionRegExp("Tinify\Exception",
+                "/Error while parsing response: Error \(#4\) \(HTTP 200\/ParseError\)/");
+        }
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+    }
+
     public function testRequestWithUnexpectedErrorShouldThrowConnectionException() {
         CurlMock::register("https://api.tinify.com/", array(
             "error" => "Failed!", "errno" => 2

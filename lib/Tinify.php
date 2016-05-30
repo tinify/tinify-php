@@ -15,6 +15,16 @@ class Tinify {
         self::$client = NULL;
     }
 
+    public static function getKey() {
+        return self::$key;
+    }
+
+    public static function createKey($email, $options) {
+        $body = array_merge(array("email" => $email), $options);
+        $response = self::getAnonymousClient()->request("post", "/keys", $body);
+        self::setKey($response->body->key);
+    }
+
     public static function setAppIdentifier($appIdentifier) {
         self::$appIdentifier = $appIdentifier;
         self::$client = NULL;
@@ -26,6 +36,10 @@ class Tinify {
 
     public static function setCompressionCount($compressionCount) {
         self::$compressionCount = $compressionCount;
+    }
+
+    public static function getAnonymousClient() {
+        return new Client(NULL, self::$appIdentifier);
     }
 
     public static function getClient() {
@@ -43,6 +57,14 @@ class Tinify {
 
 function setKey($key) {
     return Tinify::setKey($key);
+}
+
+function getKey() {
+    return Tinify::getKey();
+}
+
+function createKey($email, $options) {
+    return Tinify::createKey($email, $options);
 }
 
 function setAppIdentifier($appIdentifier) {
