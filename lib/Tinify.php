@@ -8,7 +8,9 @@ class Tinify {
     private static $key = NULL;
     private static $appIdentifier = NULL;
     private static $compressionCount = NULL;
+
     private static $client = NULL;
+    private static $anonymousClient = NULL;
 
     public static function setKey($key) {
         self::$key = $key;
@@ -28,6 +30,7 @@ class Tinify {
     public static function setAppIdentifier($appIdentifier) {
         self::$appIdentifier = $appIdentifier;
         self::$client = NULL;
+        self::$anonymousClient = NULL;
     }
 
     public static function getCompressionCount() {
@@ -36,10 +39,6 @@ class Tinify {
 
     public static function setCompressionCount($compressionCount) {
         self::$compressionCount = $compressionCount;
-    }
-
-    public static function getAnonymousClient() {
-        return new Client(NULL, self::$appIdentifier);
     }
 
     public static function getClient() {
@@ -52,6 +51,14 @@ class Tinify {
         }
 
         return self::$client;
+    }
+
+    private static function getAnonymousClient() {
+        if (!self::$anonymousClient) {
+            self::$anonymousClient = new Client(NULL, self::$appIdentifier);
+        }
+
+        return self::$anonymousClient;
     }
 }
 
