@@ -53,7 +53,7 @@ class Tinify {
         return self::$client;
     }
 
-    private static function getAnonymousClient() {
+    public static function getAnonymousClient() {
         if (!self::$anonymousClient) {
             self::$anonymousClient = new Client(NULL, self::$appIdentifier);
         }
