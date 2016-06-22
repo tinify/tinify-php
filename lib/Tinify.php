@@ -5,12 +5,14 @@ namespace Tinify;
 const VERSION = "1.3.0";
 
 class Tinify {
+    const AUTHENTICATED = true;
+    const ANONYMOUS = false;
+
     private static $key = NULL;
     private static $appIdentifier = NULL;
     private static $compressionCount = NULL;
 
     private static $client = NULL;
-    private static $anonymousClient = NULL;
 
     public static function setKey($key) {
         self::$key = $key;
@@ -23,14 +25,13 @@ class Tinify {
 
     public static function createKey($email, $options) {
         $body = array_merge(array("email" => $email), $options);
-        $response = self::getAnonymousClient()->request("post", "/keys", $body);
+        $response = self::getClient(self::ANONYMOUS)->request("post", "/keys", $body);
         self::setKey($response->body->key);
     }
 
     public static function setAppIdentifier($appIdentifier) {
         self::$appIdentifier = $appIdentifier;
         self::$client = NULL;
-        self::$anonymousClient = NULL;
     }
 
     public static function getCompressionCount() {
@@ -41,8 +42,8 @@ class Tinify {
         self::$compressionCount = $compressionCount;
     }
 
-    public static function getClient() {
-        if (!self::$key) {
+    public static function getClient($mode = self::AUTHENTICATED) {
+        if ($mode == self::AUTHENTICATED && !self::$key) {
             throw new AccountException("Provide an API key with Tinify\setKey(...)");
         }
 
@@ -53,12 +54,8 @@ class Tinify {
         return self::$client;
     }
 
-    public static function getAnonymousClient() {
-        if (!self::$anonymousClient) {
-            self::$anonymousClient = new Client(NULL, self::$appIdentifier);
-        }
-
-        return self::$anonymousClient;
+    public static function setClient($client) {
+        self::$client = $client;
     }
 }
 
