@@ -5,7 +5,7 @@ namespace Tinify;
 class Client {
     const API_ENDPOINT = "https://api.tinify.com";
 
-    private $options;
+    protected $options;
 
     public static function userAgent() {
         $curl = curl_version();
