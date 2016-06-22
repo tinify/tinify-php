@@ -39,6 +39,10 @@ class Tinify {
 
         return self::$client;
     }
+
+    public static function setClient($client) {
+        self::$client = $client;
+    }
 }
 
 function setKey($key) {

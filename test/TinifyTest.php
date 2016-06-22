@@ -43,6 +43,12 @@ class ClientTest extends TestCase {
         $this->assertInstanceOf("Tinify\Client", Tinify\Tinify::getClient());
     }
 
+    public function testSetClientShouldReplaceClient() {
+        Tinify\setKey("abcde");
+        Tinify\Tinify::setClient("foo");
+        $this->assertSame("foo", Tinify\Tinify::getClient());
+    }
+
     public function testValidateWithValidKeyShouldReturnTrue() {
         Tinify\setKey("valid");
         CurlMock::register("https://api.tinify.com/shrink", array(
