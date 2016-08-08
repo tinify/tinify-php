@@ -25,7 +25,7 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/", array());
 
-        $this->assertSame(array(), CurlMock::last(CURLOPT_HTTPHEADER));
+        $this->assertFalse(CurlMock::last_has(CURLOPT_HTTPHEADER));
     }
 
     public function testRequestWhenValidShouldIssueRequestWithJSONBody() {
