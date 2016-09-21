@@ -105,4 +105,19 @@ class Client {
         }
         return $res;
     }
+
+    function setExtraOptions($options) {
+        if (isset($options['CURLOPT_CONNECTTIMEOUT'])) {
+            $this->options[CURLOPT_CONNECTTIMEOUT] = $options['CURLOPT_CONNECTTIMEOUT'];
+        }
+        if (isset($options['CURLOPT_CONNECTTIMEOUT_MS'])) {
+            $this->options[CURLOPT_CONNECTTIMEOUT_MS] = $options['CURLOPT_CONNECTTIMEOUT_MS'];
+        }
+        if (isset($options['CURLOPT_TIMEOUT'])) {
+            $this->options[CURLOPT_TIMEOUT] = $options['CURLOPT_TIMEOUT'];
+        }
+        if (isset($options['CURLOPT_TIMEOUT_MS'])) {
+            $this->options[CURLOPT_TIMEOUT_MS] = $options['CURLOPT_TIMEOUT_MS'];
+        }
+    }
 }

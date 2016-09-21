@@ -9,6 +9,7 @@ class Tinify {
     private static $appIdentifier = NULL;
     private static $compressionCount = NULL;
     private static $client = NULL;
+    private static $options = array();
 
     public static function setKey($key) {
         self::$key = $key;
@@ -37,11 +38,17 @@ class Tinify {
             self::$client = new Client(self::$key, self::$appIdentifier);
         }
 
+        self::$client->setExtraOptions(self::$options);
+
         return self::$client;
     }
 
     public static function setClient($client) {
         self::$client = $client;
+    }
+
+    public static function setExtraOptions($options=array()) {
+        self::$options = $options;
     }
 }
 
@@ -82,4 +89,8 @@ function validate() {
     } catch (ClientException $err) {
         return true;
     }
+}
+
+function setExtraOptions($options=array()) {
+    return Tinify::setExtraOptions($options);
 }
