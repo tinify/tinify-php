@@ -173,4 +173,15 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/");
     }
+
+    public function testRequestWithServerTimeoutErrorShouldThrowExceptionWithMessage() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "error" => "Operation timed out after 1001 milliseconds with 0 bytes received", "errno" => 28
+        ));
+        $this->setExpectedExceptionRegExp("Tinify\ConnectionException",
+            "/Error while connecting: Operation timed out after 1001 milliseconds with 0 bytes received \(#28\)/");
+        $client = new Tinify\Client("key");
+        $client->setExtraOptions(array('CURLOPT_CONNECTTIMEOUT'=>1, 'CURLOPT_TIMEOUT'=>1));
+        $client->request("get", "/");
+    }
 }

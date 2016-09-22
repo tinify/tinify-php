@@ -36,9 +36,8 @@ class Tinify {
 
         if (!self::$client) {
             self::$client = new Client(self::$key, self::$appIdentifier);
+            self::$client->setExtraOptions(self::$options);
         }
-
-        self::$client->setExtraOptions(self::$options);
 
         return self::$client;
     }
