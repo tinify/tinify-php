@@ -9,7 +9,10 @@ class Tinify {
     private static $appIdentifier = NULL;
     private static $compressionCount = NULL;
     private static $client = NULL;
-    private static $options = array();
+    private static $requestTimeout = -1;
+    private static $requestTimeoutMS = -1;
+    private static $connectionTimeout = -1;
+    private static $connectionTimeoutMS = -1;
 
     public static function setKey($key) {
         self::$key = $key;
@@ -36,7 +39,18 @@ class Tinify {
 
         if (!self::$client) {
             self::$client = new Client(self::$key, self::$appIdentifier);
-            self::$client->setExtraOptions(self::$options);
+            if (self::$requestTimeout > -1) {
+                self::$client->setRequestTimeout(self::$requestTimeout);
+            }
+            if (self::$requestTimeoutMS > -1) {
+                self::$client->setRequestTimeoutMS(self::$requestTimeoutMS);
+            }
+            if (self::$connectionTimeout > -1) {
+                self::$client->setConnectionTimeout(self::$connectionTimeout);
+            }
+            if (self::$connectionTimeoutMS > -1) {
+                self::$client->setConnectionTimeoutMS(self::$connectionTimeoutMS);
+            }
         }
 
         return self::$client;
@@ -46,8 +60,24 @@ class Tinify {
         self::$client = $client;
     }
 
-    public static function setExtraOptions($options=array()) {
-        self::$options = $options;
+    public function setRequestTimeout($seconds)
+    {
+        self::$requestTimeout = $seconds;
+    }
+
+    public function setRequestTimeoutMS($milliseconds)
+    {
+        self::$requestTimeoutMS = $milliseconds;
+    }
+
+    public function setConnectionTimeout($seconds)
+    {
+        self::$connectionTimeout = $seconds;
+    }
+
+    public function setConnectionTimeoutMS($milliseconds)
+    {
+        self::$connectionTimeoutMS = $milliseconds;
     }
 }
 
@@ -65,6 +95,22 @@ function getCompressionCount() {
 
 function compressionCount() {
     return Tinify::getCompressionCount();
+}
+
+function setRequestTimeout($seconds) {
+    return Tinify::setRequestTimeout($seconds);
+}
+
+function setRequestTimeoutMS($milliseconds) {
+    return Tinify::setRequestTimeoutMS($milliseconds);
+}
+
+function setConnectionTimeout($seconds) {
+    return Tinify::setConnectionTimeout($seconds);
+}
+
+function setConnectionTimeoutMS($milliseconds) {
+    return Tinify::setConnectionTimeoutMS($milliseconds);
 }
 
 function fromFile($path) {
@@ -88,8 +134,4 @@ function validate() {
     } catch (ClientException $err) {
         return true;
     }
-}
-
-function setExtraOptions($options=array()) {
-    return Tinify::setExtraOptions($options);
 }

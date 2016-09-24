@@ -181,7 +181,40 @@ class TinifyClientTest extends TestCase {
         $this->setExpectedExceptionRegExp("Tinify\ConnectionException",
             "/Error while connecting: Operation timed out after 1001 milliseconds with 0 bytes received \(#28\)/");
         $client = new Tinify\Client("key");
-        $client->setExtraOptions(array('CURLOPT_CONNECTTIMEOUT'=>1, 'CURLOPT_TIMEOUT'=>1));
+        $client->setRequestTimeout(1);
+        $client->request("get", "/");
+    }
+
+    public function testRequestWithServerTimeoutMSErrorShouldThrowExceptionWithMessage() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "error" => "Operation timed out after 2 milliseconds with 0 bytes received", "errno" => 28
+        ));
+        $this->setExpectedExceptionRegExp("Tinify\ConnectionException",
+            "/Error while connecting: Operation timed out after 2 milliseconds with 0 bytes received \(#28\)/");
+        $client = new Tinify\Client("key");
+        $client->setRequestTimeoutMS(1);
+        $client->request("get", "/");
+    }
+
+    public function testRequestWithServerConnectionTimeoutErrorShouldThrowExceptionWithMessage() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "error" => "Connection timed out after 1001 milliseconds", "errno" => 28
+        ));
+        $this->setExpectedExceptionRegExp("Tinify\ConnectionException",
+            "/Error while connecting: Connection timed out after 1001 milliseconds \(#28\)/");
+        $client = new Tinify\Client("key");
+        $client->setConnectionTimeout(1);
+        $client->request("get", "/");
+    }
+
+    public function testRequestWithServerConnectionTimeoutMSErrorShouldThrowExceptionWithMessage() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "error" => "Connection timed out after 2 milliseconds", "errno" => 28
+        ));
+        $this->setExpectedExceptionRegExp("Tinify\ConnectionException",
+            "/Error while connecting: Connection timed out after 2 milliseconds \(#28\)/");
+        $client = new Tinify\Client("key");
+        $client->setConnectionTimeoutMS(1);
         $client->request("get", "/");
     }
 }
