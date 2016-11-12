@@ -105,4 +105,20 @@ class Client {
         }
         return $res;
     }
+
+    function setRequestTimeout($seconds) {
+        $this->options[CURLOPT_TIMEOUT] = $seconds;
+    }
+
+    function setRequestTimeoutMS($milliseconds) {
+        $this->options[CURLOPT_TIMEOUT_MS] = $milliseconds;
+    }
+
+    function setConnectionTimeout($seconds) {
+        $this->options[CURLOPT_CONNECTTIMEOUT] = $seconds;
+    }
+
+    function setConnectionTimeoutMS($milliseconds) {
+        $this->options[CURLOPT_CONNECTTIMEOUT_MS] = $milliseconds;
+    }
 }
