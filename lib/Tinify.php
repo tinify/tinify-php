@@ -60,22 +60,22 @@ class Tinify {
         self::$client = $client;
     }
 
-    public function setRequestTimeout($seconds)
+    public static function setRequestTimeout($seconds)
     {
         self::$requestTimeout = $seconds;
     }
 
-    public function setRequestTimeoutMS($milliseconds)
+    public static function setRequestTimeoutMS($milliseconds)
     {
         self::$requestTimeoutMS = $milliseconds;
     }
 
-    public function setConnectionTimeout($seconds)
+    public static function setConnectionTimeout($seconds)
     {
         self::$connectionTimeout = $seconds;
     }
 
-    public function setConnectionTimeoutMS($milliseconds)
+    public static function setConnectionTimeoutMS($milliseconds)
     {
         self::$connectionTimeoutMS = $milliseconds;
     }
