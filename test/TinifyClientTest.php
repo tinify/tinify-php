@@ -42,7 +42,6 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/");
 
-        $curl = curl_version();
         $this->assertSame(Tinify\Client::userAgent(), CurlMock::last(CURLOPT_USERAGENT));
     }
 
@@ -61,7 +60,6 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key", "TestApp/0.1");
         $client->request("get", "/");
 
-        $curl = curl_version();
         $this->assertSame(Tinify\Client::userAgent() . " TestApp/0.1", CurlMock::last(CURLOPT_USERAGENT));
     }
 
@@ -87,6 +85,16 @@ class TinifyClientTest extends TestCase {
         $response = $client->request("post", "/");
 
         $this->assertSame("binary body", $response->body);
+    }
+
+    public function testRequestWhenValidWithProxyShouldIssueRequestWithProxyAuthorization() {
+        CurlMock::register("https://api.tinify.com/", array("status" => 200));
+        $client = new Tinify\Client("key", NULL, "http://user:pass@localhost:8080");
+        $client->request("get", "/");
+
+        $this->assertSame("localhost", CurlMock::last(CURLOPT_PROXY));
+        $this->assertSame(8080, CurlMock::last(CURLOPT_PROXYPORT));
+        $this->assertSame("user:pass", CurlMock::last(CURLOPT_PROXYUSERPWD));
     }
 
     public function testRequestWithBadJSONBodyThrowExceptionWithMessage() {

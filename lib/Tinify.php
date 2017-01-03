@@ -2,7 +2,7 @@
 
 namespace Tinify;
 
-const VERSION = "1.3.0";
+const VERSION = "1.4.0";
 
 class Tinify {
     const AUTHENTICATED = true;
@@ -10,6 +10,8 @@ class Tinify {
 
     private static $key = NULL;
     private static $appIdentifier = NULL;
+    private static $proxy = NULL;
+
     private static $compressionCount = NULL;
 
     private static $client = NULL;
@@ -34,6 +36,11 @@ class Tinify {
         self::$client = NULL;
     }
 
+    public static function setProxy($proxy) {
+        self::$proxy = $proxy;
+        self::$client = NULL;
+    }
+
     public static function getCompressionCount() {
         return self::$compressionCount;
     }
@@ -48,7 +55,7 @@ class Tinify {
         }
 
         if (!self::$client) {
-            self::$client = new Client(self::$key, self::$appIdentifier);
+            self::$client = new Client(self::$key, self::$appIdentifier, self::$proxy);
         }
 
         return self::$client;
@@ -73,6 +80,10 @@ function createKey($email, $options) {
 
 function setAppIdentifier($appIdentifier) {
     return Tinify::setAppIdentifier($appIdentifier);
+}
+
+function setProxy($proxy) {
+    return Tinify::setProxy($proxy);
 }
 
 function getCompressionCount() {
