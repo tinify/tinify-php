@@ -51,7 +51,8 @@ class Client {
         }
     }
 
-    function request($method, $url, $body = NULL, $header = array()) {
+    function request($method, $url, $body = NULL) {
+        $header = array();
         if (is_array($body)) {
             if (!empty($body)) {
                 $body = json_encode($body);
