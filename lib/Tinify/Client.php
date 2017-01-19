@@ -63,6 +63,12 @@ class Client {
         }
 
         $request = curl_init();
+        if ($request === false || $request === null) {
+            throw new ConnectionException(
+                "Error while connecting: curl extension is not functional or disabled."
+            );
+        }
+
         curl_setopt_array($request, $this->options);
 
         $url = strtolower(substr($url, 0, 6)) == "https:" ? $url : Client::API_ENDPOINT . $url;
