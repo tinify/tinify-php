@@ -53,7 +53,8 @@ class Client {
         }
     }
 
-    function request($method, $url, $body = NULL, $header = array()) {
+    function request($method, $url, $body = NULL) {
+        $header = array();
         if (is_array($body)) {
             if (!empty($body)) {
                 $body = json_encode($body);
@@ -64,6 +65,12 @@ class Client {
         }
 
         $request = curl_init();
+        if ($request === false || $request === null) {
+            throw new ConnectionException(
+                "Error while connecting: curl extension is not functional or disabled."
+            );
+        }
+
         curl_setopt_array($request, $this->options);
 
         $url = strtolower(substr($url, 0, 6)) == "https:" ? $url : self::API_ENDPOINT . $url;
