@@ -5,6 +5,9 @@ namespace Tinify;
 class Client {
     const API_ENDPOINT = "https://api.tinify.com";
 
+    const RETRY_COUNT = 1;
+    const RETRY_DELAY = 500;
+
     protected $options;
 
     public static function userAgent() {
@@ -64,73 +67,82 @@ class Client {
             }
         }
 
-        $request = curl_init();
-        if ($request === false || $request === null) {
-            throw new ConnectionException(
-                "Error while connecting: curl extension is not functional or disabled."
-            );
-        }
-
-        curl_setopt_array($request, $this->options);
-
-        $url = strtolower(substr($url, 0, 6)) == "https:" ? $url : self::API_ENDPOINT . $url;
-        curl_setopt($request, CURLOPT_URL, $url);
-        curl_setopt($request, CURLOPT_CUSTOMREQUEST, strtoupper($method));
-
-        if (count($header) > 0) {
-            curl_setopt($request, CURLOPT_HTTPHEADER, $header);
-        }
-
-        if ($body) {
-            curl_setopt($request, CURLOPT_POSTFIELDS, $body);
-        }
-
-        $response = curl_exec($request);
-
-        if (is_string($response)) {
-            $status = curl_getinfo($request, CURLINFO_HTTP_CODE);
-            $headerSize = curl_getinfo($request, CURLINFO_HEADER_SIZE);
-            curl_close($request);
-
-            $headers = self::parseHeaders(substr($response, 0, $headerSize));
-            $body = substr($response, $headerSize);
-
-            if (isset($headers["compression-count"])) {
-                Tinify::setCompressionCount(intval($headers["compression-count"]));
+        for ($retries = self::RETRY_COUNT; $retries >= 0; $retries--) {
+            if ($retries < self::RETRY_COUNT) {
+                usleep(self::RETRY_DELAY * 1000);
             }
 
-            $isJson = false;
-            if (isset($headers["content-type"])) {
-                /* Parse JSON response bodies. */
-                list($contentType) = explode(";", $headers["content-type"], 2);
-                if (strtolower(trim($contentType)) == "application/json") {
-                    $isJson = true;
+            $request = curl_init();
+            if ($request === false || $request === null) {
+                throw new ConnectionException(
+                    "Error while connecting: curl extension is not functional or disabled."
+                );
+            }
+
+            curl_setopt_array($request, $this->options);
+
+            $url = strtolower(substr($url, 0, 6)) == "https:" ? $url : self::API_ENDPOINT . $url;
+            curl_setopt($request, CURLOPT_URL, $url);
+            curl_setopt($request, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+
+            if (count($header) > 0) {
+                curl_setopt($request, CURLOPT_HTTPHEADER, $header);
+            }
+
+            if ($body) {
+                curl_setopt($request, CURLOPT_POSTFIELDS, $body);
+            }
+
+            $response = curl_exec($request);
+
+            if (is_string($response)) {
+                $status = curl_getinfo($request, CURLINFO_HTTP_CODE);
+                $headerSize = curl_getinfo($request, CURLINFO_HEADER_SIZE);
+                curl_close($request);
+
+                $headers = self::parseHeaders(substr($response, 0, $headerSize));
+                $body = substr($response, $headerSize);
+
+                if (isset($headers["compression-count"])) {
+                    Tinify::setCompressionCount(intval($headers["compression-count"]));
                 }
-            }
 
-            /* 1xx and 3xx are unexpected and will be treated as error. */
-            $isError = $status <= 199 || $status >= 300;
-
-            if ($isJson || $isError) {
-                /* Parse JSON bodies, always interpret errors as JSON. */
-                $body = json_decode($body);
-                if (!$body) {
-                    $message = sprintf("Error while parsing response: %s (#%d)",
-                        PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
-                        json_last_error());
-                    throw Exception::create($message, "ParseError", $status);
+                $isJson = false;
+                if (isset($headers["content-type"])) {
+                    /* Parse JSON response bodies. */
+                    list($contentType) = explode(";", $headers["content-type"], 2);
+                    if (strtolower(trim($contentType)) == "application/json") {
+                        $isJson = true;
+                    }
                 }
-            }
 
-            if ($isError) {
-                throw Exception::create($body->message, $body->error, $status);
-            }
+                /* 1xx and 3xx are unexpected and will be treated as error. */
+                $isError = $status <= 199 || $status >= 300;
 
-            return (object) array("body" => $body, "headers" => $headers);
-        } else {
-            $message = sprintf("%s (#%d)", curl_error($request), curl_errno($request));
-            curl_close($request);
-            throw new ConnectionException("Error while connecting: " . $message);
+                if ($isJson || $isError) {
+                    /* Parse JSON bodies, always interpret errors as JSON. */
+                    $body = json_decode($body);
+                    if (!$body) {
+                        $message = sprintf("Error while parsing response: %s (#%d)",
+                            PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
+                            json_last_error());
+                        if ($retries > 0 && $status >= 500) continue;
+                        throw Exception::create($message, "ParseError", $status);
+                    }
+                }
+
+                if ($isError) {
+                    if ($retries > 0 && $status >= 500) continue;
+                    throw Exception::create($body->message, $body->error, $status);
+                }
+
+                return (object) array("body" => $body, "headers" => $headers);
+            } else {
+                $message = sprintf("%s (#%d)", curl_error($request), curl_errno($request));
+                curl_close($request);
+                if ($retries > 0) continue;
+                throw new ConnectionException("Error while connecting: " . $message);
+            }
         }
     }
 
