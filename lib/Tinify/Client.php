@@ -59,11 +59,12 @@ class Client {
         if (is_array($body)) {
             if (!empty($body)) {
                 $body = json_encode($body);
-                array_push($header, "Content-Type: application/json");
             } else {
                 $body = NULL;
             }
         }
+        
+        array_push($header, "Content-Type: application/json");
 
         for ($retries = self::RETRY_COUNT; $retries >= 0; $retries--) {
             if ($retries < self::RETRY_COUNT) {
