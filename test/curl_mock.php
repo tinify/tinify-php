@@ -6,7 +6,7 @@ class CurlMockException extends Exception {
 }
 
 class CurlMock {
-    const DEFAULT_VERSION = array(
+    private static $default_version = array(
         "version_number" => 471808,
         "version" => "7.51.0",
         "features" => 951197,
@@ -14,7 +14,7 @@ class CurlMock {
 
     private static $urls = array();
     private static $requests = array();
-    private static $version = self::DEFAULT_VERSION;
+    private static $version = array();
 
     public $options = array();
     public $response;
@@ -44,7 +44,7 @@ class CurlMock {
     public static function reset() {
         self::$requests = array();
         self::$urls = array();
-        self::$version = self::DEFAULT_VERSION;
+        self::$version = self::$default_version;
     }
 
     public static function last_has($key) {
