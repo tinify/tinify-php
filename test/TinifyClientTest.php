@@ -3,10 +3,6 @@
 use Tinify\CurlMock;
 
 class TinifyClientTest extends TestCase {
-    public function tearDown() {
-        CurlMock::reset_version_info();
-    }
-
     public function testRequestWhenValidShouldIssueRequest() {
         CurlMock::register("https://api.tinify.com/", array("status" => 200));
         $client = new Tinify\Client("key");
