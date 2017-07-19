@@ -301,4 +301,23 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/");
     }
+
+    public function testRequestWithNoSSLCurlShouldThrowExceptionWithMessage() {
+        CurlMock::register("https://api.tinify.com/", array("status" => 200));
+        CurlMock::set_version_info_key("features", (CURL_VERSION_LIBZ | CURL_VERSION_IPV6));
+        $this->setExpectedException("Tinify\ClientException",
+            "Your curl version does not support secure connections");
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+    }
+
+    public function testRequestWithOutdatedCurlShouldThrowExceptionWithMessage() {
+        CurlMock::register("https://api.tinify.com/", array("status" => 200));
+        CurlMock::set_version_info_key("version_number", 0x070f05);
+        CurlMock::set_version_info_key("version", "7.15.5");
+        $this->setExpectedException("Tinify\ClientException",
+            "Your curl version 7.15.5 is outdated; please upgrade to 7.18.1 or higher");
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+    }
 }

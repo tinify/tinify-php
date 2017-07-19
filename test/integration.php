@@ -10,6 +10,7 @@ class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
     static public function setUpBeforeClass() {
         \Tinify\setKey(getenv("TINIFY_KEY"));
         \Tinify\setProxy(getenv("TINIFY_PROXY"));
+        \Tinify\validate();
 
         $unoptimizedPath = __DIR__ . "/examples/voormedia.png";
         self::$optimized = \Tinify\fromFile($unoptimizedPath);
