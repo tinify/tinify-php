@@ -20,8 +20,6 @@ class Client {
     }
 
     function __construct($key, $appIdentifier = NULL, $proxy = NULL) {
-        $userAgent = join(" ", array_filter(array(self::userAgent(), $appIdentifier)));
-
         $curl = curl_version();
 
         if (!($curl["features"] & CURL_VERSION_SSL)) {
@@ -32,6 +30,8 @@ class Client {
             $version = $curl["version"];
             throw new ClientException("Your curl version ${version} is outdated; please upgrade to 7.18.1 or higher");
         }
+
+        $userAgent = join(" ", array_filter(array(self::userAgent(), $appIdentifier)));
 
         $this->options = array(
             CURLOPT_BINARYTRANSFER => true,
