@@ -1,3 +1,6 @@
+## 1.5.2
+* Fail early if version of curl/openssl is too old.
+
 ## 1.5.1
 * Expose status of exceptions.
 
