@@ -10,13 +10,40 @@ class Client {
 
     private $options;
 
+    /** @var string */
+    private static $caFile = null;
+
+    /**
+     * @return string
+     */
     public static function userAgent() {
         $curl = curl_version();
         return "Tinify/" . VERSION . " PHP/" . PHP_VERSION . " curl/" . $curl["version"];
     }
 
-    private static function caBundle() {
-        return __DIR__ . "/../data/cacert.pem";
+    /**
+     * @param string $caFile
+     */
+    public static function setCaBundlePath($caFile) {
+        if(is_readable($caFile)) {
+            static::$caFile = $caFile;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private static function caBundle()
+    {
+        if (!static::$caFile) {
+            if (!ini_get('curl.cainfo')) {
+                return __DIR__ . "/../data/cacert.pem";
+            }
+
+            return ini_get('curl.cainfo');
+        }
+
+        return static::$caFile;
     }
 
     function __construct($key, $app_identifier = NULL, $proxy = NULL) {
