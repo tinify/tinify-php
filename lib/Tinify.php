@@ -13,6 +13,9 @@ class Tinify {
     private static $proxy = NULL;
 
     private static $compressionCount = NULL;
+    private static $remainingCredits = NULL;
+    private static $payingState = NULL;
+    private static $emailAddress = NULL;
 
     private static $client = NULL;
 
@@ -47,6 +50,30 @@ class Tinify {
 
     public static function setCompressionCount($compressionCount) {
         self::$compressionCount = $compressionCount;
+    }
+
+    public static function getRemainingCredits() {
+        return self::$remainingCredits;
+    }
+
+    public static function setRemainingCredits($remainingCredits) {
+        self::$remainingCredits = $remainingCredits;
+    }
+
+    public static function getPayingState() {
+        return self::$payingState;
+    }
+
+    public static function setPayingState($payingState) {
+        self::$payingState = $payingState;
+    }
+
+    public static function getEmailAddress() {
+        return self::$emailAddress;
+    }
+
+    public static function setEmailAddress($emailAddress) {
+        self::$emailAddress = $emailAddress;
     }
 
     public static function getClient($mode = self::AUTHENTICATED) {
@@ -94,6 +121,30 @@ function compressionCount() {
     return Tinify::getCompressionCount();
 }
 
+function getRemainingCredits() {
+    return Tinify::getRemainingCredits();
+}
+
+function remainingCredits() {
+    return Tinify::getRemainingCredits();
+}
+
+function getPayingState() {
+    return Tinify::getPayingState();
+}
+
+function payingState() {
+    return Tinify::getPayingState();
+}
+
+function getEmailAddress() {
+    return Tinify::getEmailAddress();
+}
+
+function emailAddress() {
+    return Tinify::getEmailAddress();
+}
+
 function fromFile($path) {
     return Source::fromFile($path);
 }
@@ -108,7 +159,8 @@ function fromUrl($string) {
 
 function validate() {
     try {
-        Tinify::getClient()->request("post", "/shrink");
+        Tinify::getClient()->request("get", "/keys/" . Tinify::getKey());
+        return true;
     } catch (AccountException $err) {
         if ($err->status == 429) return true;
         throw $err;

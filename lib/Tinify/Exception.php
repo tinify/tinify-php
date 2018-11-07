@@ -6,7 +6,7 @@ class Exception extends \Exception {
     public $status;
 
     public static function create($message, $type, $status) {
-        if ($status == 401 || $status == 403 || $status == 429) {
+        if ($status == 401 || $status == 403 || $status == 404 || $status == 429) {
             $klass = "Tinify\AccountException";
         } else if($status >= 400 && $status <= 499) {
             $klass = "Tinify\ClientException";

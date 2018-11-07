@@ -55,6 +55,36 @@ class TinifyClientTest extends TestCase {
         $this->assertSame(12, Tinify\getCompressionCount());
     }
 
+    public function testRequestWhenValidShouldUpdateRemainingCredits() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200, "headers" => array("Compression-Count-Remaining" => "488")
+        ));
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+
+        $this->assertSame(488, Tinify\getRemainingCredits());
+    }
+
+    public function testRequestWhenValidShouldUpdatePayingState() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200, "headers" => array("Paying-State" => "free")
+        ));
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+
+        $this->assertSame("free", Tinify\getPayingState());
+    }
+
+    public function testRequestWhenValidShouldUpdateEmailAddress() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200, "headers" => array("Email-Address" => "test@example.com")
+        ));
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+
+        $this->assertSame("test@example.com", Tinify\getEmailAddress());
+    }
+
     public function testRequestWhenValidWithAppIdShouldIssueRequestWithUserAgent() {
         CurlMock::register("https://api.tinify.com/", array("status" => 200));
         $client = new Tinify\Client("key", "TestApp/0.1");
