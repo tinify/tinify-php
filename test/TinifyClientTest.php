@@ -101,8 +101,7 @@ class TinifyClientTest extends TestCase {
         ));
         $client = new Tinify\Client("key");
         $response = $client->request("post", "/");
-
-        $this->assertEquals((object) array("hello" => "world"), $response->body);
+        $this->assertSame("world", $response->body->hello);
     }
 
     public function testRequestWhenValidShouldNotParseBinaryBody() {
