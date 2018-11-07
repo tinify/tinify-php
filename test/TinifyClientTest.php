@@ -62,7 +62,7 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/");
 
-        $this->assertSame(488, Tinify\getRemainingCredits());
+        $this->assertSame(488, Tinify\remainingCredits());
     }
 
     public function testRequestWhenValidShouldUpdatePayingState() {
@@ -72,7 +72,7 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/");
 
-        $this->assertSame("free", Tinify\getPayingState());
+        $this->assertSame("free", Tinify\payingState());
     }
 
     public function testRequestWhenValidShouldUpdateEmailAddress() {
@@ -82,7 +82,7 @@ class TinifyClientTest extends TestCase {
         $client = new Tinify\Client("key");
         $client->request("get", "/");
 
-        $this->assertSame("test@example.com", Tinify\getEmailAddress());
+        $this->assertSame("test@example.com", Tinify\emailAddress());
     }
 
     public function testRequestWhenValidWithAppIdShouldIssueRequestWithUserAgent() {

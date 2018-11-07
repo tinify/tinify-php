@@ -121,24 +121,12 @@ function compressionCount() {
     return Tinify::getCompressionCount();
 }
 
-function getRemainingCredits() {
-    return Tinify::getRemainingCredits();
-}
-
 function remainingCredits() {
     return Tinify::getRemainingCredits();
 }
 
-function getPayingState() {
-    return Tinify::getPayingState();
-}
-
 function payingState() {
     return Tinify::getPayingState();
-}
-
-function getEmailAddress() {
-    return Tinify::getEmailAddress();
 }
 
 function emailAddress() {
