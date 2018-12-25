@@ -43,8 +43,17 @@ class Client {
 
         if ($proxy) {
             $parts = parse_url($proxy);
-            if (isset($parts["host"])) {
-                $this->options[CURLOPT_PROXYTYPE] = CURLPROXY_HTTP;
+            if (isset($parts['scheme']) && isset($parts["host"])) {
+                switch ($parts['scheme']) {
+                    case 'http':
+                        $this->options[CURLOPT_PROXYTYPE] = CURLPROXY_HTTP;
+                        break;
+                    case 'socks5':
+                        $this->options[CURLOPT_PROXYTYPE] = CURLPROXY_SOCKS5;
+                        break;
+                    default:
+                        $this->options[CURLOPT_PROXYTYPE] = CURLPROXY_HTTP;
+                }
                 $this->options[CURLOPT_PROXY] = $parts["host"];
             } else {
                 throw new ConnectionException("Invalid proxy");
