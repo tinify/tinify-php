@@ -1,3 +1,4 @@
+# This is Amezing and Awesome Project.......
 [<img src="https://travis-ci.org/tinify/tinify-php.svg?branch=master" alt="Build Status">](https://travis-ci.org/tinify/tinify-php)
 
 # Tinify API client for PHP
