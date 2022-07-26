@@ -18,7 +18,7 @@ jobs:
           "8.0",
           "8.1",
         ]
-        os: [ubuntu-latest] # , macOS-latest, windows-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
       - uses: shivammathur/setup-php@2.21.0
         with:
@@ -27,15 +27,31 @@ jobs:
       - uses: actions/checkout@v3
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
-      # - name: Cache Composer packages
-      #   id: composer-cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: vendor
-      #     key: ${{ matrix.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
-      #     restore-keys: |
-      #       ${{ matrix.os }}-php-${{ matrix.php-version }}-
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-progress
       - name: Run test suite
         run: vendor/bin/phpunit
+  Integration_tests:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    needs: Unit_tests
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [
+          "7.4",
+          "8.1",
+        ]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    steps:
+      - uses: shivammathur/setup-php@2.21.0
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress
+      - name: Run test suite
+        env:
+          TINIFY_KEY: ${{ secrets.TINIFY_KEY }}
+        run: vendor/bin/phpunit --no-configuration test/integration.php
