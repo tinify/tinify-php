@@ -4,10 +4,11 @@ if (!getenv("TINIFY_KEY")) {
     exit("Set the TINIFY_KEY environment variable.\n");
 }
 
-class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
+
+class Integration extends \PHPUnit\Framework\TestCase {
     static private $optimized;
 
-    static public function setUpBeforeClass() {
+    static public function setUpBeforeClass(): void {
         \Tinify\setKey(getenv("TINIFY_KEY"));
         \Tinify\setProxy(getenv("TINIFY_PROXY"));
         \Tinify\validate();
@@ -27,8 +28,8 @@ class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
         $this->assertLessThan(1500, $size);
 
         /* width == 137 */
-        $this->assertContains("\0\0\0\x89", $contents);
-        $this->assertNotContains("Copyright Voormedia", $contents);
+        $this->assertStringContainsString("\0\0\0\x89", $contents);
+        $this->assertStringNotContainsString("Copyright Voormedia", $contents);
     }
 
     public function testShouldCompressFromUrl() {
@@ -43,8 +44,8 @@ class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
         $this->assertLessThan(1500, $size);
 
         /* width == 137 */
-        $this->assertContains("\0\0\0\x89", $contents);
-        $this->assertNotContains("Copyright Voormedia", $contents);
+        $this->assertStringContainsString("\0\0\0\x89", $contents);
+        $this->assertStringNotContainsString("Copyright Voormedia", $contents);
     }
 
     public function testShouldResize() {
@@ -58,8 +59,8 @@ class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
         $this->assertLessThan(1000, $size);
 
         /* width == 50 */
-        $this->assertContains("\0\0\0\x32", $contents);
-        $this->assertNotContains("Copyright Voormedia", $contents);
+        $this->assertStringContainsString("\0\0\0\x32", $contents);
+        $this->assertStringNotContainsString("Copyright Voormedia", $contents);
     }
 
     public function testShouldPreserveMetadata() {
@@ -73,7 +74,7 @@ class ClientIntegrationTest extends PHPUnit_Framework_TestCase {
         $this->assertLessThan(2000, $size);
 
         /* width == 137 */
-        $this->assertContains("\0\0\0\x89", $contents);
-        $this->assertContains("Copyright Voormedia", $contents);
+        $this->assertStringContainsString("\0\0\0\x89", $contents);
+        $this->assertStringContainsString("Copyright Voormedia", $contents);
     }
 }

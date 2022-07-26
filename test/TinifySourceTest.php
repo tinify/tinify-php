@@ -3,13 +3,6 @@
 use Tinify\CurlMock;
 
 class TinifySourceTest extends TestCase {
-    private $dummyFile;
-
-    public function setUp() {
-        parent::setUp();
-        $this->dummyFile = __DIR__ . "/examples/dummy.png";
-    }
-
     public function testWithInvalidApiKeyFromFileShouldThrowAccountException() {
         Tinify\setKey("invalid");
 
@@ -18,7 +11,7 @@ class TinifySourceTest extends TestCase {
         ));
 
         $this->setExpectedException("Tinify\AccountException");
-        Tinify\Source::fromFile($this->dummyFile);
+        Tinify\Source::fromFile(DUMMY_FILE_LOCATION);
     }
 
     public function testWithInvalidApiKeyFromBufferShouldThrowAccountException() {
@@ -50,7 +43,7 @@ class TinifySourceTest extends TestCase {
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
 
-        $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromFile($this->dummyFile));
+        $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromFile(DUMMY_FILE_LOCATION));
     }
 
     public function testWithValidApiKeyFromFileShouldReturnSourceWithData() {
@@ -64,7 +57,7 @@ class TinifySourceTest extends TestCase {
             "status" => 200, "body" => "compressed file"
         ));
 
-        $this->assertSame("compressed file", Tinify\Source::fromFile($this->dummyFile)->toBuffer());
+        $this->assertSame("compressed file", Tinify\Source::fromFile(DUMMY_FILE_LOCATION)->toBuffer());
     }
 
     public function testWithValidApiKeyFromBufferShouldReturnSource() {
