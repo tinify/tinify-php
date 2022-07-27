@@ -1,4 +1,7 @@
-[<img src="https://travis-ci.org/tinify/tinify-php.svg?branch=master" alt="Build Status">](https://travis-ci.org/tinify/tinify-php)
+[![MIT License](http://img.shields.io/badge/license-MIT-green.svg) ](https://github.com/tinify/tinify-php/blob/main/LICENSE)
+[![CI](https://github.com/tinify/tinify-php/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/tinify/tinify-php/actions/workflows/ci-cd.yml)
+[![Packagist Version](https://img.shields.io/packagist/v/tinify/tinify)](https://packagist.org/packages/tinify/tinify)
+[![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/tinify/tinify)](https://packagist.org/packages/tinify/tinify)
 
 # Tinify API client for PHP
 
