@@ -42,6 +42,16 @@ class Source {
         return new Result($response->headers, $response->body);
     }
 
+    public function transcode($types) {
+        $commands = array_merge($this->commands, array("type" => $types));
+        return new self($this->url, $commands);
+    }
+
+    public function transform($options) {
+        $commands = array_merge($this->commands, array("transform" => $options));
+        return new self($this->url, $commands);
+    }
+
     public function result() {
         $response = Tinify::getClient()->request("get", $this->url, $this->commands);
         return new Result($response->headers, $response->body);

@@ -226,6 +226,66 @@ class TinifySourceTest extends TestCase {
         $this->assertSame("{\"resize\":{\"width\":400}}", CurlMock::last(CURLOPT_POSTFIELDS));
     }
 
+    public function testTranscodeShouldReturnSource() {
+        Tinify\setKey("valid");
+
+        CurlMock::register("https://api.tinify.com/shrink", array(
+            "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
+        ));
+
+        CurlMock::register("https://api.tinify.com/some/location", array(
+            "status" => 200, "body" => "transcoded file"
+        ));
+
+        $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromBuffer("png file")->transcode("image/webp"));
+        $this->assertSame("png file", CurlMock::last(CURLOPT_POSTFIELDS));
+    }
+
+    public function testTranscodeShouldReturnSourceWithData() {
+        Tinify\setKey("valid");
+
+        CurlMock::register("https://api.tinify.com/shrink", array(
+            "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
+        ));
+
+        CurlMock::register("https://api.tinify.com/some/location", array(
+            "status" => 200, "body" => "transcoded file"
+        ));
+
+        $this->assertSame("transcoded file", Tinify\Source::fromBuffer("png file")->transcode("image/webp")->toBuffer());
+        $this->assertSame("{\"type\":\"image\/webp\"}", CurlMock::last(CURLOPT_POSTFIELDS));
+    }
+
+    public function testTransformShouldReturnSource() {
+        Tinify\setKey("valid");
+
+        CurlMock::register("https://api.tinify.com/shrink", array(
+            "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
+        ));
+
+        CurlMock::register("https://api.tinify.com/some/location", array(
+            "status" => 200, "body" => "transformed file"
+        ));
+
+        $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromBuffer("png file")->transform(array("background" => "black")));
+        $this->assertSame("png file", CurlMock::last(CURLOPT_POSTFIELDS));
+    }
+
+    public function testTransformShouldReturnSourceWithData() {
+        Tinify\setKey("valid");
+
+        CurlMock::register("https://api.tinify.com/shrink", array(
+            "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
+        ));
+
+        CurlMock::register("https://api.tinify.com/some/location", array(
+            "status" => 200, "body" => "transformd file"
+        ));
+
+        $this->assertSame("transformd file", Tinify\Source::fromBuffer("png file")->transform(array("background" => "black"))->toBuffer());
+        $this->assertSame("{\"transform\":{\"background\":\"black\"}}", CurlMock::last(CURLOPT_POSTFIELDS));
+    }
+
     public function testWithValidApiKeyStoreShouldReturnResultMeta() {
         Tinify\setKey("valid");
 
