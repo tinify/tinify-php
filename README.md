@@ -1,5 +1,5 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-green.svg) ](https://github.com/tinify/tinify-php/blob/main/LICENSE)
-[![CI](https://github.com/tinify/tinify-php/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/tinify/tinify-php/actions/workflows/ci-cd.yml)
+[![CI_CD](https://github.com/tinify/tinify-php/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/tinify/tinify-php/actions/workflows/ci-cd.yaml)
 [![Packagist Version](https://img.shields.io/packagist/v/tinify/tinify)](https://packagist.org/packages/tinify/tinify)
 [![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/tinify/tinify)](https://packagist.org/packages/tinify/tinify)
 
