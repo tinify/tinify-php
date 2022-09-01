@@ -231,6 +231,19 @@ class TinifyClientTest extends TestCase {
         $client->request("get", "/");
     }
 
+    public function testRequestWithBodyAndServerErrorRepeatedlyShouldThrowServerException() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "body" => '{"email":"user@gmail.com"}'
+        ), array(
+            "status" => 500, "body" => '{"error":"InternalServerError","message":"Oops!"}'
+        ));
+        
+        $this->setExpectedException("Tinify\ServerException");
+        $client = new Tinify\Client("key");
+        $response = $client->request("post", "/", array("email"=> "user@gmail.com"));
+        $this->assertEquals("", $response->body);
+    }
+
     public function testRequestWithServerErrorRepeatedlyShouldThrowExceptionWithMessage() {
         CurlMock::register("https://api.tinify.com/", array(
             "status" => 584, "body" => '{"error":"InternalServerError","message":"Oops!"}'

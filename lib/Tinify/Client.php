@@ -112,7 +112,7 @@ class Client {
                 curl_close($request);
 
                 $headers = self::parseHeaders(substr($response, 0, $headerSize));
-                $body = substr($response, $headerSize);
+                $responseBody = substr($response, $headerSize);
 
                 if (isset($headers["compression-count"])) {
                     Tinify::setCompressionCount(intval($headers["compression-count"]));
@@ -144,8 +144,8 @@ class Client {
 
                 if ($isJson || $isError) {
                     /* Parse JSON bodies, always interpret errors as JSON. */
-                    $body = json_decode($body);
-                    if (!$body) {
+                    $responseBody = json_decode($responseBody);
+                    if (!$responseBody) {
                         $message = sprintf("Error while parsing response: %s (#%d)",
                             PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
                             json_last_error());
@@ -160,11 +160,11 @@ class Client {
                     if ($status == 404) {
                         throw Exception::create(null, null, $status);
                     } else {
-                        throw Exception::create($body->message, $body->error, $status);
+                        throw Exception::create($responseBody->message, $responseBody->error, $status);
                     }
                 }
 
-                return (object) array("body" => $body, "headers" => $headers);
+                return (object) array("body" => $responseBody, "headers" => $headers);
             } else {
                 $message = sprintf("%s (#%d)", curl_error($request), curl_errno($request));
                 curl_close($request);
