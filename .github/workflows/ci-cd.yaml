@@ -1,5 +1,5 @@
 ---
-name: CI_CD
+name: PHP CI/CD
 
 on: [push, pull_request]
 
@@ -32,6 +32,7 @@ jobs:
       - name: Run test suite
         run: vendor/bin/phpunit
   Integration_tests:
+    if: github.event_name == 'push'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     needs: Unit_tests
