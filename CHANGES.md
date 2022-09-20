@@ -1,6 +1,7 @@
 ## 1.6.0
 * Support to run the unittests on newer versions of PHP (5.5 +)
-* Add API methods for transcoding and transformation
+* Add API methods for converting/transcoding and transformation
+* Add helper function for returning the compressed file extension
 
 ## 1.5.2
 * Fail early if version of curl/openssl is too old.
