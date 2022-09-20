@@ -42,8 +42,8 @@ class Source {
         return new Result($response->headers, $response->body);
     }
 
-    public function transcode($types) {
-        $commands = array_merge($this->commands, array("type" => $types));
+    public function convert($options) {
+        $commands = array_merge($this->commands, array("convert" => $options));
         return new self($this->url, $commands);
     }
 

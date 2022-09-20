@@ -226,7 +226,7 @@ class TinifySourceTest extends TestCase {
         $this->assertSame("{\"resize\":{\"width\":400}}", CurlMock::last(CURLOPT_POSTFIELDS));
     }
 
-    public function testTranscodeShouldReturnSource() {
+    public function testConvertShouldReturnSource() {
         Tinify\setKey("valid");
 
         CurlMock::register("https://api.tinify.com/shrink", array(
@@ -234,14 +234,14 @@ class TinifySourceTest extends TestCase {
         ));
 
         CurlMock::register("https://api.tinify.com/some/location", array(
-            "status" => 200, "body" => "transcoded file"
+            "status" => 200, "body" => "Convertd file"
         ));
 
-        $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromBuffer("png file")->transcode("image/webp"));
+        $this->assertInstanceOf("Tinify\Source", Tinify\Source::fromBuffer("png file")->Convert(array("type" =>"image/webp")));
         $this->assertSame("png file", CurlMock::last(CURLOPT_POSTFIELDS));
     }
 
-    public function testTranscodeShouldReturnSourceWithData() {
+    public function testConvertShouldReturnSourceWithData() {
         Tinify\setKey("valid");
 
         CurlMock::register("https://api.tinify.com/shrink", array(
@@ -249,11 +249,11 @@ class TinifySourceTest extends TestCase {
         ));
 
         CurlMock::register("https://api.tinify.com/some/location", array(
-            "status" => 200, "body" => "transcoded file"
+            "status" => 200, "body" => "Convertd file"
         ));
 
-        $this->assertSame("transcoded file", Tinify\Source::fromBuffer("png file")->transcode("image/webp")->toBuffer());
-        $this->assertSame("{\"type\":\"image\/webp\"}", CurlMock::last(CURLOPT_POSTFIELDS));
+        $this->assertSame("Convertd file", Tinify\Source::fromBuffer("png file")->convert(array("type" => "image/webp"))->toBuffer());
+        $this->assertSame("{\"convert\":{\"type\":\"image\/webp\"}}", CurlMock::last(CURLOPT_POSTFIELDS));
     }
 
     public function testTransformShouldReturnSource() {

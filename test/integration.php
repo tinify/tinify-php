@@ -78,9 +78,9 @@ class Integration extends \PHPUnit\Framework\TestCase {
         $this->assertStringContainsString("Copyright Voormedia", $contents);
     }
 
-    public function testShouldTranscode() {
+    public function testShouldConvert() {
         $path = tempnam(sys_get_temp_dir(), "tinify-php");
-        self::$optimized->transcode(["image/webp"])->toFile($path);
+        self::$optimized->convert(array("type" => ["image/webp"]))->toFile($path);
 
         $size = filesize($path);
         $contents = fread(fopen($path, "rb"), $size);
