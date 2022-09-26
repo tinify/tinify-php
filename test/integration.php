@@ -77,4 +77,15 @@ class Integration extends \PHPUnit\Framework\TestCase {
         $this->assertStringContainsString("\0\0\0\x89", $contents);
         $this->assertStringContainsString("Copyright Voormedia", $contents);
     }
+
+    public function testShouldConvert() {
+        $path = tempnam(sys_get_temp_dir(), "tinify-php");
+        self::$optimized->convert(array("type" => ["image/webp"]))->toFile($path);
+
+        $size = filesize($path);
+        $contents = fread(fopen($path, "rb"), $size);
+
+        $this->assertEquals(substr($contents, 0, 4), "RIFF");
+        $this->assertEquals(substr($contents, 8, 4), "WEBP");
+    }
 }
