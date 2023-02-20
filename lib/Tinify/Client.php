@@ -28,7 +28,7 @@ class Client {
 
         if ($curl["version_number"] < 0x071201) {
             $version = $curl["version"];
-            throw new ClientException("Your curl version ${version} is outdated; please upgrade to 7.18.1 or higher");
+            throw new ClientException("Your curl version {$version} is outdated; please upgrade to 7.18.1 or higher");
         }
 
         $this->options = array(
