@@ -28,7 +28,7 @@ class Client {
 
         if ($curl["version_number"] < 0x071201) {
             $version = $curl["version"];
-            throw new ClientException("Your curl version ${version} is outdated; please upgrade to 7.18.1 or higher");
+            throw new ClientException("Your curl version {$version} is outdated; please upgrade to 7.18.1 or higher");
         }
 
         $this->options = array(
@@ -110,17 +110,17 @@ class Client {
                 curl_close($request);
 
                 $headers = self::parseHeaders(substr($response, 0, $headerSize));
-                $body = substr($response, $headerSize);
+                $responseBody = substr($response, $headerSize);
 
                 if (isset($headers["compression-count"])) {
                     Tinify::setCompressionCount(intval($headers["compression-count"]));
                 }
 
                 if ($status >= 200 && $status <= 299) {
-                    return (object) array("body" => $body, "headers" => $headers);
+                    return (object) array("body" => $responseBody, "headers" => $headers);
                 }
 
-                $details = json_decode($body);
+                $details = json_decode($responseBody);
                 if (!$details) {
                     $message = sprintf("Error while parsing response: %s (#%d)",
                         PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
