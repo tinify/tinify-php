@@ -32,7 +32,6 @@ class Client {
         }
 
         $this->options = array(
-            CURLOPT_BINARYTRANSFER => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
             CURLOPT_USERPWD => "api:" . $key,
