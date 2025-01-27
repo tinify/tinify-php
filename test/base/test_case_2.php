@@ -3,7 +3,7 @@ abstract class TestCase_2 extends \PHPUnit\Framework\TestCase {
     protected  function setUp(): void {
         Tinify\CurlMock::reset();
         Tinify\setKey(NULL);
-        TInify\setProxy(NULL);
+        Tinify\setProxy(NULL);
     }
 
     protected function tearDown(): void {

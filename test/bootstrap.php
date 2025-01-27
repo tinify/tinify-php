@@ -1,7 +1,7 @@
 <?php
 
-require_once("curl_mock.php");
 require_once("vendor" . DIRECTORY_SEPARATOR . "autoload.php");
+require_once("curl_mock.php");
 
 
 # Some PHPUnit glue to support testing PHP 5.4 and onwards together

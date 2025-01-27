@@ -34,7 +34,7 @@
   },
 
   "autoload": {
-    "files": ["lib/Tinify.php", "lib/Tinify/Exception.php"],
-    "psr-4": {"Tinify\\": "lib/Tinify/"}
+    "psr-4": {"Tinify\\": "lib/Tinify/"},
+    "files": ["lib/functions.php"]
   }
 }

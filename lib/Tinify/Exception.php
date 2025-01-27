@@ -29,8 +29,3 @@ class Exception extends \Exception {
         }
     }
 }
-
-class AccountException extends Exception {}
-class ClientException extends Exception {}
-class ServerException extends Exception {}
-class ConnectionException extends Exception {}
