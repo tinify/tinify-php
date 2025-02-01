@@ -3,13 +3,6 @@
 use Tinify\CurlMock;
 
 class ClientTest extends TestCase {
-    private $dummyFile;
-
-    public function setUp() {
-        parent::setUp();
-        $this->dummyFile = __DIR__ . "/examples/dummy.png";
-    }
-
     public function testGetKeyWithoutKeyShouldReturnNull() {
         $this->assertSame(NULL, Tinify\getKey());
     }
