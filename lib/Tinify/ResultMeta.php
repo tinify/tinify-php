@@ -20,4 +20,12 @@ class ResultMeta {
     public function location() {
         return isset($this->meta["location"]) ? $this->meta["location"] : null;
     }
+
+    public function extension() {
+        if (isset($this->meta["content-type"])) {
+            $parts = explode("/", $this->meta["content-type"]);
+            return end($parts);
+        }
+        return null;
+    }
 }

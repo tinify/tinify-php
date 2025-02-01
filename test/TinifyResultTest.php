@@ -32,4 +32,14 @@ class TinifyResultTest extends TestCase {
         $result = new Tinify\Result(array(), "image data");
         $this->assertSame("image data", $result->toBuffer());
     }
+
+    public function testWithMetadataReturnsExtension() {
+        $result = new Tinify\Result(array("content-type" => "image/png"), "image data");
+        $this->assertSame($result->extension(), "png");
+    }
+
+    public function testWithoutMetadataReturnsExtensionAsNull() {
+        $result = new Tinify\ResultMeta(array(), "image data");
+        $this->assertSame($result->extension(), null);
+    }
 }
