@@ -28,13 +28,12 @@ class Client {
 
         if ($curl["version_number"] < 0x071201) {
             $version = $curl["version"];
-            throw new ClientException("Your curl version ${version} is outdated; please upgrade to 7.18.1 or higher");
+            throw new ClientException("Your curl version {$version} is outdated; please upgrade to 7.18.1 or higher");
         }
 
         $userAgent = join(" ", array_filter(array(self::userAgent(), $appIdentifier)));
 
         $this->options = array(
-            CURLOPT_BINARYTRANSFER => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
             CURLOPT_USERPWD => $key ? ("api:" . $key) : NULL,
@@ -124,6 +123,21 @@ class Client {
 
                 if ( isset( $headers["paying-state"] ) ) {
                     Tinify::setPayingState( $headers["paying-state"] );
+                }
+                
+                if ($status >= 200 && $status <= 299) {
+                    return (object) array("body" => $responseBody, "headers" => $headers);
+                }
+
+                $details = json_decode($responseBody);
+                if (!$details) {
+                    $message = sprintf("Error while parsing response: %s (#%d)",
+                        PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
+                        json_last_error());
+                    $details = (object) array(
+                        "message" => $message,
+                        "error" => "ParseError"
+                    );
                 }
 
                 if ( isset( $headers["email-address"] ) ) {

@@ -137,7 +137,7 @@ class ClientTest extends TestCase {
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
         Tinify\setKey("valid");
-        $this->assertInstanceOf("Tinify\Source", Tinify\fromFile($this->dummyFile));
+        $this->assertInstanceOf("Tinify\Source", Tinify\fromFile(DUMMY_FILE_LOCATION));
     }
 
     public function testFromBufferShouldReturnSource() {
