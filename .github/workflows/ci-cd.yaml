@@ -1,0 +1,58 @@
+---
+name: PHP CI/CD
+
+on: [push, pull_request]
+
+permissions: {}
+jobs:
+  Unit_tests:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [
+          "5.4",
+          "5.6",
+          "7.4",
+          "8.0",
+          "8.4",
+        ]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    steps:
+      - uses: shivammathur/setup-php@2.32.0
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2
+      - uses: actions/checkout@v3
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress
+      - name: Run test suite
+        run: vendor/bin/phpunit
+  Integration_tests:
+    if: github.event_name == 'push'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    needs: Unit_tests
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [
+          "7.4",
+          "8.4",
+        ]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    steps:
+      - uses: shivammathur/setup-php@2.32.0
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress
+      - name: Run test suite
+        env:
+          TINIFY_KEY: ${{ secrets.TINIFY_KEY }}
+        run: vendor/bin/phpunit --no-configuration test/integration.php
