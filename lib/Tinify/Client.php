@@ -113,7 +113,7 @@ class Client {
                 $headers = self::parseHeaders(substr($response, 0, $headerSize));
                 $responseBody = substr($response, $headerSize);
 
-                if (isset($headers["compression-count"])) {
+                if ( isset($headers["compression-count"] ) ) {
                     Tinify::setCompressionCount(intval($headers["compression-count"]));
                 }
 
@@ -123,10 +123,6 @@ class Client {
 
                 if ( isset( $headers["paying-state"] ) ) {
                     Tinify::setPayingState( $headers["paying-state"] );
-                }
-                
-                if ($status >= 200 && $status <= 299) {
-                    return (object) array("body" => $responseBody, "headers" => $headers);
                 }
 
                 $details = json_decode($responseBody);
