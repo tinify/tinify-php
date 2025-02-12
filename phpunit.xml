@@ -1,4 +1,4 @@
-<phpunit bootstrap="test/helper.php" colors="true">
+<phpunit bootstrap="test/bootstrap.php" colors="true">
     <testsuites>
         <testsuite name="Tinify PHP Test Suite">
             <directory suffix="Test.php">test</directory>

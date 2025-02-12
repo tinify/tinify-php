@@ -3,13 +3,6 @@
 use Tinify\CurlMock;
 
 class ClientTest extends TestCase {
-    private $dummyFile;
-
-    public function setUp() {
-        parent::setUp();
-        $this->dummyFile = __DIR__ . "/examples/dummy.png";
-    }
-
     public function testGetKeyWithoutKeyShouldReturnNull() {
         $this->assertSame(NULL, Tinify\getKey());
     }
@@ -137,7 +130,7 @@ class ClientTest extends TestCase {
             "status" => 201, "headers" => array("Location" => "https://api.tinify.com/some/location")
         ));
         Tinify\setKey("valid");
-        $this->assertInstanceOf("Tinify\Source", Tinify\fromFile($this->dummyFile));
+        $this->assertInstanceOf("Tinify\Source", Tinify\fromFile(DUMMY_FILE_LOCATION));
     }
 
     public function testFromBufferShouldReturnSource() {
