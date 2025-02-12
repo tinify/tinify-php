@@ -8,7 +8,7 @@ class Client {
     const RETRY_COUNT = 1;
     const RETRY_DELAY = 500;
 
-    private $options;
+    protected $options;
 
     public static function userAgent() {
         $curl = curl_version();
@@ -19,7 +19,7 @@ class Client {
         return __DIR__ . "/../data/cacert.pem";
     }
 
-    function __construct($key, $app_identifier = NULL, $proxy = NULL) {
+    function __construct($key, $appIdentifier = NULL, $proxy = NULL) {
         $curl = curl_version();
 
         if (!($curl["features"] & CURL_VERSION_SSL)) {
@@ -31,13 +31,15 @@ class Client {
             throw new ClientException("Your curl version {$version} is outdated; please upgrade to 7.18.1 or higher");
         }
 
+        $userAgent = join(" ", array_filter(array(self::userAgent(), $appIdentifier)));
+
         $this->options = array(
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
-            CURLOPT_USERPWD => "api:" . $key,
+            CURLOPT_USERPWD => $key ? ("api:" . $key) : NULL,
             CURLOPT_CAINFO => self::caBundle(),
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_USERAGENT => join(" ", array_filter(array(self::userAgent(), $app_identifier))),
+            CURLOPT_USERAGENT => $userAgent,
         );
 
         if ($proxy) {
@@ -111,12 +113,16 @@ class Client {
                 $headers = self::parseHeaders(substr($response, 0, $headerSize));
                 $responseBody = substr($response, $headerSize);
 
-                if (isset($headers["compression-count"])) {
+                if ( isset($headers["compression-count"] ) ) {
                     Tinify::setCompressionCount(intval($headers["compression-count"]));
                 }
 
-                if ($status >= 200 && $status <= 299) {
-                    return (object) array("body" => $responseBody, "headers" => $headers);
+                if ( isset( $headers["compression-count-remaining"] ) ) {
+                    Tinify::setRemainingCredits( intval( $headers["compression-count-remaining"] ) );
+                }
+
+                if ( isset( $headers["paying-state"] ) ) {
+                    Tinify::setPayingState( $headers["paying-state"] );
                 }
 
                 $details = json_decode($responseBody);
@@ -130,8 +136,45 @@ class Client {
                     );
                 }
 
-                if ($retries > 0 && $status >= 500) continue;
-                throw Exception::create($details->message, $details->error, $status);
+                if ( isset( $headers["email-address"] ) ) {
+                    Tinify::setEmailAddress( $headers["email-address"] );
+                }
+
+                $isJson = false;
+                if (isset($headers["content-type"])) {
+                    /* Parse JSON response bodies. */
+                    list($contentType) = explode(";", $headers["content-type"], 2);
+                    if (strtolower(trim($contentType)) == "application/json") {
+                        $isJson = true;
+                    }
+                }
+
+                /* 1xx and 3xx are unexpected and will be treated as error. */
+                $isError = $status <= 199 || $status >= 300;
+
+                if ($isJson || $isError) {
+                    /* Parse JSON bodies, always interpret errors as JSON. */
+                    $responseBody = json_decode($responseBody);
+                    if (!$responseBody) {
+                        $message = sprintf("Error while parsing response: %s (#%d)",
+                            PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
+                            json_last_error());
+                        if ($retries > 0 && $status >= 500) continue;
+                        throw Exception::create($message, "ParseError", $status);
+                    }
+                }
+
+                if ($isError) {
+                    if ($retries > 0 && $status >= 500) continue;
+                    /* When the key doesn't exist a 404 response is given. */
+                    if ($status == 404) {
+                        throw Exception::create(null, null, $status);
+                    } else {
+                        throw Exception::create($responseBody->message, $responseBody->error, $status);
+                    }
+                }
+
+                return (object) array("body" => $responseBody, "headers" => $headers);
             } else {
                 $message = sprintf("%s (#%d)", curl_error($request), curl_errno($request));
                 curl_close($request);
@@ -146,14 +189,14 @@ class Client {
             $headers = explode("\r\n", $headers);
         }
 
-        $res = array();
+        $result = array();
         foreach ($headers as $header) {
             if (empty($header)) continue;
             $split = explode(":", $header, 2);
             if (count($split) === 2) {
-                $res[strtolower($split[0])] = trim($split[1]);
+                $result[strtolower($split[0])] = trim($split[1]);
             }
         }
-        return $res;
+        return $result;
     }
 }
