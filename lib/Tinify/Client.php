@@ -31,6 +31,11 @@ class Client {
             throw new ClientException("Your curl version {$version} is outdated; please upgrade to 7.18.1 or higher");
         }
 
+        # Set minimum TLS version to 1.2, CURL_SSLVERSION_TLSv1_2 is not available in curl < 7.34.0
+        # Additionally old PHP versions may not support this constant
+        $tlsVersion = ($curl["version_number"] < 0x072200)
+            ? 6
+            : (defined('CURL_SSLVERSION_TLSv1_2') ? CURL_SSLVERSION_TLSv1_2 : 6);
         $this->options = array(
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
@@ -38,6 +43,7 @@ class Client {
             CURLOPT_CAINFO => self::caBundle(),
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_USERAGENT => join(" ", array_filter(array(self::userAgent(), $app_identifier))),
+            CURLOPT_SSLVERSION => $tlsVersion,
         );
 
         if ($proxy) {
