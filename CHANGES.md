@@ -1,3 +1,6 @@
+## 1.6.4
+* Will use POST instead of GET when retrieving result.
+
 ## 1.6.3
 * Add minimum TLS 1.2 version to curl options as protocol negotiation on certain openssl/libcurl versions is flaky.
 
