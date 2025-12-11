@@ -2,7 +2,7 @@
 
 namespace Tinify;
 
-const VERSION = "1.6.2";
+const VERSION = "1.6.4";
 
 class Tinify {
     const AUTHENTICATED = true;
