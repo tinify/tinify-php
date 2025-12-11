@@ -132,6 +132,31 @@ class TinifySourceTest extends TestCase {
         ));
 
         $this->assertInstanceOf("Tinify\Result", Tinify\Source::fromBuffer("png file")->result());
+        $this->assertSame("GET", CurlMock::last(CURLOPT_CUSTOMREQUEST));
+    }
+
+    /**
+     * When request does not contain commands, it should use method GET
+     * when it contains commands, it should have a body and method POST
+     */
+    public function testResultWithCommandsShouldReturnResultUsingPost() {
+        Tinify\setKey("valid");
+
+        CurlMock::register("https://api.tinify.com/shrink", array(
+            "status" => 201,
+            "headers" => array("Location" => "https://api.tinify.com/some/location"),
+        ));
+
+        CurlMock::register("https://api.tinify.com/some/location", array(
+            "status" => 200, "body" => "resized file"
+        ));
+
+        $source = Tinify\Source::fromBuffer("png file")->resize(array("width" => 400));
+        $result = $source->result();
+
+        $this->assertInstanceOf("Tinify\Result", $result);
+        $this->assertSame("POST", CurlMock::last(CURLOPT_CUSTOMREQUEST));
+        $this->assertSame('{"resize":{"width":400}}', CurlMock::last(CURLOPT_POSTFIELDS));
     }
 
     public function testPreserveShouldReturnSource() {
@@ -162,6 +187,7 @@ class TinifySourceTest extends TestCase {
 
         $this->assertSame("copyrighted file", Tinify\Source::fromBuffer("png file")->preserve("copyright", "location")->toBuffer());
         $this->assertSame("{\"preserve\":[\"copyright\",\"location\"]}", CurlMock::last(CURLOPT_POSTFIELDS));
+        $this->assertSame("POST", CurlMock::last(CURLOPT_CUSTOMREQUEST));
     }
 
     public function testPreserveShouldReturnSourceWithDataForArray() {

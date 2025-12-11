@@ -19,7 +19,7 @@ class Client {
         return __DIR__ . "/../data/cacert.pem";
     }
 
-    function __construct($key, $appIdentifier = NULL, $proxy = NULL) {
+    function __construct($key, $app_identifier = NULL, $proxy = NULL) {
         $curl = curl_version();
 
         if (!($curl["features"] & CURL_VERSION_SSL)) {
@@ -31,15 +31,19 @@ class Client {
             throw new ClientException("Your curl version {$version} is outdated; please upgrade to 7.18.1 or higher");
         }
 
-        $userAgent = join(" ", array_filter(array(self::userAgent(), $appIdentifier)));
-
+        # Set minimum TLS version to 1.2, CURL_SSLVERSION_TLSv1_2 is not available in curl < 7.34.0
+        # Additionally old PHP versions may not support this constant
+        $tlsVersion = ($curl["version_number"] < 0x072200)
+            ? 6
+            : (defined('CURL_SSLVERSION_TLSv1_2') ? CURL_SSLVERSION_TLSv1_2 : 6);
         $this->options = array(
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
             CURLOPT_USERPWD => $key ? ("api:" . $key) : NULL,
             CURLOPT_CAINFO => self::caBundle(),
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_USERAGENT => $userAgent,
+            CURLOPT_USERAGENT => join(" ", array_filter(array(self::userAgent(), $app_identifier))),
+            CURLOPT_SSLVERSION => $tlsVersion,
         );
 
         if ($proxy) {
@@ -108,7 +112,11 @@ class Client {
             if (is_string($response)) {
                 $status = curl_getinfo($request, CURLINFO_HTTP_CODE);
                 $headerSize = curl_getinfo($request, CURLINFO_HEADER_SIZE);
-                curl_close($request);
+                if (PHP_VERSION_ID < 80000) {
+                    curl_close($request);
+                } else {
+                    unset($request);
+                }
 
                 $headers = self::parseHeaders(substr($response, 0, $headerSize));
                 $responseBody = substr($response, $headerSize);
@@ -177,7 +185,11 @@ class Client {
                 return (object) array("body" => $responseBody, "headers" => $headers);
             } else {
                 $message = sprintf("%s (#%d)", curl_error($request), curl_errno($request));
-                curl_close($request);
+                if (PHP_VERSION_ID < 80000) {
+                    curl_close($request);
+                } else {
+                    unset($request);
+                }
                 if ($retries > 0) continue;
                 throw new ConnectionException("Error while connecting: " . $message);
             }
