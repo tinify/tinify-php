@@ -142,8 +142,8 @@ class Source {
     }
 
     /**
-     * @param array $options
-     * @return array
+     * @param array $options Array of options from func_get_args()
+     * @return array Flattened array
      */
     private static function flatten($options) {
         $flattened = array();
