@@ -5,6 +5,12 @@ namespace Tinify;
 class Exception extends \Exception {
     public $status;
 
+    /**
+     * @param string $message
+     * @param string $type
+     * @param int $status
+     * @return Exception|AccountException|ClientException|ServerException
+     */
     public static function create($message, $type, $status) {
         if ($status == 401 || $status == 429) {
             $klass = "Tinify\AccountException";
@@ -20,6 +26,11 @@ class Exception extends \Exception {
         return new $klass($message, $type, $status);
     }
 
+    /**
+     * @param string $message
+     * @param string|null $type
+     * @param int|null $status
+     */
     function __construct($message, $type = NULL, $status = NULL) {
         $this->status = $status;
         if ($status) {

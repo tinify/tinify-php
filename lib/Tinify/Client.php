@@ -10,15 +10,28 @@ class Client {
 
     private $options;
 
+    /**
+     * @return string
+     */
     public static function userAgent() {
         $curl = curl_version();
         return "Tinify/" . VERSION . " PHP/" . PHP_VERSION . " curl/" . $curl["version"];
     }
 
+    /**
+     * @return string
+     */
     private static function caBundle() {
         return __DIR__ . "/../data/cacert.pem";
     }
 
+    /**
+     * @param string $key
+     * @param string|null $app_identifier
+     * @param string|null $proxy
+     * @throws ClientException
+     * @throws ConnectionException
+     */
     function __construct($key, $app_identifier = NULL, $proxy = NULL) {
         $curl = curl_version();
 
@@ -70,6 +83,16 @@ class Client {
         }
     }
 
+    /**
+     * @param string $method
+     * @param string $url
+     * @param string|array|null $body
+     * @return object{body: string, headers: array}
+     * @throws AccountException
+     * @throws ClientException
+     * @throws ServerException
+     * @throws ConnectionException
+     */
     function request($method, $url, $body = NULL) {
         $header = array();
         if (is_array($body)) {
@@ -155,6 +178,10 @@ class Client {
         }
     }
 
+    /**
+     * @param string|array $headers
+     * @return array
+     */
     protected static function parseHeaders($headers) {
         if (!is_array($headers)) {
             $headers = explode("\r\n", $headers);
