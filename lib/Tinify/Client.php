@@ -87,7 +87,7 @@ class Client {
      * @param string $method
      * @param string $url
      * @param string|array|null $body
-     * @return object{body: string, headers: array}
+     * @return \stdClass Object with 'body' (string) and 'headers' (array) properties
      * @throws AccountException
      * @throws ClientException
      * @throws ServerException
