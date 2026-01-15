@@ -1,0 +1,5 @@
+parameters:
+    level: max
+    paths:
+        - lib
+    phpVersion: 50300

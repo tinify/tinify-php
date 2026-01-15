@@ -31,6 +31,19 @@ jobs:
         run: composer install --no-ansi --no-interaction --no-progress
       - name: Run test suite
         run: vendor/bin/phpunit
+  PHPStan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: shivammathur/setup-php@2.32.0
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
   Integration_tests:
     if: github.event_name == 'push'
     runs-on: ${{ matrix.os }}
