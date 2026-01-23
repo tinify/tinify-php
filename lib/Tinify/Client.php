@@ -3,22 +3,54 @@
 namespace Tinify;
 
 class Client {
+    /**
+     * The default endpoint
+     */
     const API_ENDPOINT = "https://api.tinify.com";
 
+    /**
+     * Number of retries on failure
+     */
     const RETRY_COUNT = 1;
+
+    /**
+     * The time between retrieves
+     */
     const RETRY_DELAY = 500;
 
     private $options;
 
+    /**
+     * Retrieves the user agent identifier
+     * contains client version, php version and curl version
+     *
+     * @return string
+     */
     public static function userAgent() {
         $curl = curl_version();
         return "Tinify/" . VERSION . " PHP/" . PHP_VERSION . " curl/" . $curl["version"];
     }
 
+    /**
+     * Path the the certifcates
+     *
+     * @return string
+     */
     private static function caBundle() {
         return __DIR__ . "/../data/cacert.pem";
     }
 
+    /**
+     * Constructor for client
+     * validates if curl meets requirements,
+     *
+     * @param string $key api key
+     * @param string|null $app_identifier identifier for the client
+     * @param string|null $proxy an optional proxy url to go to first
+     * @return void
+     * 
+     * @throws ClientException when curl version is not supported
+     */
     function __construct($key, $app_identifier = NULL, $proxy = NULL) {
         $curl = curl_version();
 
@@ -70,6 +102,17 @@ class Client {
         }
     }
 
+    /**
+     * Makes an HTTP request to the API.
+     *
+     * @param string $method The HTTP method (GET, POST, etc.).
+     * @param string $url The endpoint path.
+     * @param array|string|null $body Optional. The request body. Default null.
+     * @return object An object with 'body' and 'headers' properties.
+     *
+     * @throws ConnectionException If the connection fails.
+     * @throws Exception If the API returns an error response.
+     */
     function request($method, $url, $body = NULL) {
         $header = array();
         if (is_array($body)) {
@@ -155,6 +198,12 @@ class Client {
         }
     }
 
+    /**
+     * Parses HTTP headers
+     *
+     * @param array|string $headers The request headers
+     * @return array lowercased headers
+     */
     protected static function parseHeaders($headers) {
         if (!is_array($headers)) {
             $headers = explode("\r\n", $headers);
