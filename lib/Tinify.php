@@ -42,7 +42,7 @@ class Tinify {
     }
 
     /**
-     * sets the app identifier and resets the client.
+     * Sets the app identifier and resets the client.
      *
      * @param string $appIdentifier
      * @return void
@@ -53,9 +53,9 @@ class Tinify {
     }
 
     /**
-     * sets the proxy and resets the client
+     * Sets the proxy and resets the client.
      *
-     * @param [type] $proxy
+     * @param string $proxy Url to the proxy
      * @return void
      */
     public static function setProxy($proxy) {
