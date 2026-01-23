@@ -141,7 +141,7 @@ class Source {
      * 
      *
      * @param string $path Local file path
-     * @return int|false Returns positive int if succesful
+     * @return int|false Returns positive int if successful
      */
     public function toFile($path) {
         return $this->result()->toFile($path);

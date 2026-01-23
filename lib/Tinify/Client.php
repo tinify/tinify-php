@@ -32,7 +32,7 @@ class Client {
     }
 
     /**
-     * Path the the certifcates
+     * Path the the certificates
      *
      * @return string
      */
