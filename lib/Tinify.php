@@ -6,34 +6,34 @@ const VERSION = "1.6.4";
 
 class Tinify {
     /**
-     * @var string|null api key
+     * @var string|null API key.
      */
     private static $key = NULL;
 
     /**
-     * @var string|null identifier used for requests
+     * @var string|null Identifier used for requests.
      */
     private static $appIdentifier = NULL;
 
     /**
-     * @var string|null url to the compression API 
+     * @var string|null URL to the compression API.
      */
     private static $proxy = NULL;
 
     /**
-     * @var int|null the number of compressions
+     * @var int|null The number of compressions.
      */
     private static $compressionCount = NULL;
 
     /**
-     * @var Client|null tinify client
+     * @var Client|null Tinify client.
      */
     private static $client = NULL;
 
     /**
      * Sets the key and resets the client.
      *
-     * @param string $key
+     * @param string $key The API key.
      * @return void
      */
     public static function setKey($key) {
@@ -44,7 +44,7 @@ class Tinify {
     /**
      * Sets the app identifier and resets the client.
      *
-     * @param string $appIdentifier
+     * @param string $appIdentifier The app identifier.
      * @return void
      */
     public static function setAppIdentifier($appIdentifier) {
@@ -55,7 +55,7 @@ class Tinify {
     /**
      * Sets the proxy and resets the client.
      *
-     * @param string $proxy Url to the proxy
+     * @param string $proxy URL to the proxy server.
      * @return void
      */
     public static function setProxy($proxy) {
@@ -64,7 +64,7 @@ class Tinify {
     }
 
     /**
-     * Retrieves the compression count
+     * Retrieves the compression count.
      *
      * @return int|null
      */
@@ -83,8 +83,8 @@ class Tinify {
     }
 
     /**
-     * Retrieve the tinify client
-     * Will initiate a new client with the current key, identifier and proxy
+     * Retrieves the tinify client.
+     * Will initiate a new client with the current key, identifier and proxy.
      *
      * @return Client
      */

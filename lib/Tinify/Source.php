@@ -3,7 +3,7 @@
 namespace Tinify;
 
 /**
- * Represents an compressed image source.
+ * Represents a compressed image source.
  */
 class Source {
     private $url, $commands;
