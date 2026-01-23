@@ -5,36 +5,89 @@ namespace Tinify;
 const VERSION = "1.6.4";
 
 class Tinify {
+    /**
+     * @var string|null api key
+     */
     private static $key = NULL;
+
+    /**
+     * @var string|null identifier used for requests
+     */
     private static $appIdentifier = NULL;
+
+    /**
+     * @var string|null url to the compression API 
+     */
     private static $proxy = NULL;
 
+    /**
+     * @var int|null the number of compressions
+     */
     private static $compressionCount = NULL;
+
+    /**
+     * @var Client|null tinify client
+     */
     private static $client = NULL;
 
+    /**
+     * Sets the key and resets the client.
+     *
+     * @param string $key
+     * @return void
+     */
     public static function setKey($key) {
         self::$key = $key;
         self::$client = NULL;
     }
 
+    /**
+     * sets the app identifier and resets the client.
+     *
+     * @param string $appIdentifier
+     * @return void
+     */
     public static function setAppIdentifier($appIdentifier) {
         self::$appIdentifier = $appIdentifier;
         self::$client = NULL;
     }
 
+    /**
+     * sets the proxy and resets the client
+     *
+     * @param [type] $proxy
+     * @return void
+     */
     public static function setProxy($proxy) {
         self::$proxy = $proxy;
         self::$client = NULL;
     }
 
+    /**
+     * Retrieves the compression count
+     *
+     * @return int|null
+     */
     public static function getCompressionCount() {
         return self::$compressionCount;
     }
 
+    /**
+     * Sets the compression count
+     *
+     * @param int $compressionCount
+     * @return void
+     */
     public static function setCompressionCount($compressionCount) {
         self::$compressionCount = $compressionCount;
     }
 
+    /**
+     * Retrieve the tinify client
+     * Will initiate a new client with the current key, identifier and proxy
+     *
+     * @return Client
+     */
     public static function getClient() {
         if (!self::$key) {
             throw new AccountException("Provide an API key with Tinify\setKey(...)");
@@ -47,6 +100,12 @@ class Tinify {
         return self::$client;
     }
 
+    /**
+     * Sets a new client
+     *
+     * @param Client $client
+     * @return void
+     */
     public static function setClient($client) {
         self::$client = $client;
     }
