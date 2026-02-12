@@ -7,7 +7,7 @@
 * Add minimum TLS 1.2 version to curl options as protocol negotiation on certain openssl/libcurl versions is flaky.
 
 ## 1.6.2
-* Remove deprecated curl constant (https://php.watch/versions/8.4/CURLOPT_BINARYTRANSFER-deprecated)
+* Remove deprecated curl constant (https://php.watch/versions/8.4/CURLOPT_BINARYTRANSFER-deprecated).
 
 ## 1.6.1
 * Fixed string interpolation for php 8.2: https://wiki.php.net/rfc/deprecate_dollar_brace_string_interpolation
