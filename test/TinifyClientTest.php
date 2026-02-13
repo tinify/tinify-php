@@ -55,12 +55,65 @@ class TinifyClientTest extends TestCase {
         $this->assertSame(12, Tinify\getCompressionCount());
     }
 
+    public function testRequestWhenValidShouldUpdateRemainingCredits() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200, "headers" => array("Compression-Count-Remaining" => "488")
+        ));
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+
+        $this->assertSame(488, Tinify\remainingCredits());
+    }
+
+    public function testRequestWhenValidShouldUpdatePayingState() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200, "headers" => array("Paying-State" => "free")
+        ));
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+
+        $this->assertSame("free", Tinify\payingState());
+    }
+
+    public function testRequestWhenValidShouldUpdateEmailAddress() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200, "headers" => array("Email-Address" => "test@example.com")
+        ));
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
+
+        $this->assertSame("test@example.com", Tinify\emailAddress());
+    }
+
     public function testRequestWhenValidWithAppIdShouldIssueRequestWithUserAgent() {
         CurlMock::register("https://api.tinify.com/", array("status" => 200));
         $client = new Tinify\Client("key", "TestApp/0.1");
         $client->request("get", "/");
 
         $this->assertSame(Tinify\Client::userAgent() . " TestApp/0.1", CurlMock::last(CURLOPT_USERAGENT));
+    }
+
+    public function testRequestWhenValidShouldParseJSONBody() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200,
+            "body" => '{"hello":"world"}',
+            "headers" => array("Content-Type" => "application/JSON; charset=utf-8")
+        ));
+        $client = new Tinify\Client("key");
+        $response = $client->request("post", "/");
+        $this->assertSame("world", $response->body->hello);
+    }
+
+    public function testRequestWhenValidShouldNotParseBinaryBody() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200,
+            "body" => "binary body",
+            "headers" => array("Content-Type" => "image/png")
+        ));
+        $client = new Tinify\Client("key");
+        $response = $client->request("post", "/");
+
+        $this->assertSame("binary body", $response->body);
     }
 
     public function testRequestWhenValidWithProxyShouldIssueRequestWithProxyAuthorization() {
@@ -71,6 +124,23 @@ class TinifyClientTest extends TestCase {
         $this->assertSame("localhost", CurlMock::last(CURLOPT_PROXY));
         $this->assertSame(8080, CurlMock::last(CURLOPT_PROXYPORT));
         $this->assertSame("user:pass", CurlMock::last(CURLOPT_PROXYUSERPWD));
+    }
+
+    public function testRequestWithBadJSONBodyThrowExceptionWithMessage() {
+        CurlMock::register("https://api.tinify.com/", array(
+            "status" => 200,
+            "body" => '<!-- this is not json -->',
+            "headers" => array("Content-Type" => "application/JSON"),
+        ));
+        if (PHP_VERSION_ID >= 50500) {
+            $this->setExpectedExceptionRegExp("Tinify\Exception",
+                "/Error while parsing response: Syntax error \(#4\) \(HTTP 200\/ParseError\)/");
+        } else {
+            $this->setExpectedExceptionRegExp("Tinify\Exception",
+                "/Error while parsing response: Error \(#4\) \(HTTP 200\/ParseError\)/");
+        }
+        $client = new Tinify\Client("key");
+        $client->request("get", "/");
     }
 
     public function testRequestWithUnexpectedErrorOnceShouldReturnResponse() {

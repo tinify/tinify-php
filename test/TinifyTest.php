@@ -3,6 +3,45 @@
 use Tinify\CurlMock;
 
 class ClientTest extends TestCase {
+    public function testGetKeyWithoutKeyShouldReturnNull() {
+        $this->assertSame(NULL, Tinify\getKey());
+    }
+
+    public function testGetKeyWithKeyShouldReturnKey() {
+        Tinify\setKey("abcde");
+        $this->assertSame("abcde", Tinify\getKey());
+    }
+
+    public function testCreateKeyWithNewEmailShouldSetKey() {
+        CurlMock::register("https://api.tinify.com/keys", array(
+            "status" => 202,
+            "body" => '{"key":"abcdefg123"}',
+            "headers" => array("Content-Type" => "application/json"),
+        ));
+
+        Tinify\createKey("user@example.com", array(
+            "name" => "John",
+            "identifier" => "My Tinify plugin",
+            "link" => "https://mywebsite.example.com/admin/settings",
+        ));
+
+        $this->assertSame("abcdefg123", Tinify\getKey());
+    }
+
+    public function testCreateKeyWithDuplicateEmailShouldThrowClientException() {
+        CurlMock::register("https://api.tinify.com/keys", array(
+            "status" => 403,
+            "body" => '{"error":"Duplicate registration","message":"This email address has already been used"}',
+        ));
+
+        $this->setExpectedException("Tinify\AccountException");
+        Tinify\createKey("user@example.com", array(
+            "name" => "John",
+            "identifier" => "My Tinify plugin",
+            "link" => "https://mywebsite.example.com/admin/settings",
+        ));
+    }
+
     public function testKeyShouldResetClientWithNewKey() {
         CurlMock::register("https://api.tinify.com/", array("status" => 200));
         Tinify\setKey("abcde");
@@ -63,24 +102,24 @@ class ClientTest extends TestCase {
 
     public function testValidateWithValidKeyShouldReturnTrue() {
         Tinify\setKey("valid");
-        CurlMock::register("https://api.tinify.com/shrink", array(
-            "status" => 400, "body" => '{"error":"Input missing","message":"No input"}'
+        CurlMock::register("https://api.tinify.com/keys/valid", array(
+            "status" => 200, "body" => '{}'
         ));
         $this->assertTrue(Tinify\validate());
     }
 
     public function testValidateWithLimitedKeyShouldReturnTrue() {
-        Tinify\setKey("invalid");
-        CurlMock::register("https://api.tinify.com/shrink", array(
-            "status" => 429, "body" => '{"error":"Too many requests","message":"Your monthly limit has been exceeded"}'
+        Tinify\setKey("limited");
+        CurlMock::register("https://api.tinify.com/keys/limited", array(
+            "status" => 200, "body" => '{}'
         ));
         $this->assertTrue(Tinify\validate());
     }
 
     public function testValidateWithErrorShouldThrowException() {
         Tinify\setKey("invalid");
-        CurlMock::register("https://api.tinify.com/shrink", array(
-            "status" => 401, "body" => '{"error":"Unauthorized","message":"Credentials are invalid"}'
+        CurlMock::register("https://api.tinify.com/keys/invalid", array(
+            "status" => 404, "body" => '{}'
         ));
         $this->setExpectedException("Tinify\AccountException");
         Tinify\validate();
