@@ -53,7 +53,10 @@ class Source {
     }
 
     public function result() {
-        $response = Tinify::getClient()->request("get", $this->url, $this->commands);
+        $has_commands  = !empty($this->commands);
+        $method = $has_commands ? "post" : "get";
+        $body = $has_commands ? $this->commands : null;
+        $response = Tinify::getClient()->request($method, $this->url, $body);
         return new Result($response->headers, $response->body);
     }
 
