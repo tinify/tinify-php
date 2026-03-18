@@ -87,7 +87,7 @@ class Client {
             }
 
             $request = curl_init();
-            if ($request === false || $request === null) {
+            if ($request === false) {
                 throw new ConnectionException(
                     "Error while connecting: curl extension is not functional or disabled."
                 );
