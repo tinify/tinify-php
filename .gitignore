@@ -1,3 +1,5 @@
 vendor
+vendor-phpstan
 .phpunit.result.cache
 composer.lock
+composer.phpstan.lock

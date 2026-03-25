@@ -16,6 +16,6 @@ jobs:
           php-version: "7.4"
           tools: composer:v2
       - name: Install Dependencies
-        run: composer install --no-ansi --no-interaction --no-progress
+        run: COMPOSER=composer.phpstan.json composer install --no-ansi --no-interaction --no-progress
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse
+        run: vendor-phpstan/bin/phpstan analyse
