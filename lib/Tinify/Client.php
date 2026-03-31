@@ -153,6 +153,7 @@ class Client {
                 throw new ConnectionException("Error while connecting: " . $message);
             }
         }
+        throw new ConnectionException("Error while connecting: max retries exceeded");
     }
 
     protected static function parseHeaders($headers) {
