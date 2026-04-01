@@ -1,0 +1,9 @@
+{
+  "description": "composer for PHPStan to still support php5.4 and higher in the main composer file",
+  "config": {
+    "vendor-dir": "vendor-phpstan"
+  },
+  "require": {
+    "phpstan/phpstan": "^2.1"
+  }
+}

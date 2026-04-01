@@ -112,15 +112,15 @@ class Tinify {
 }
 
 function setKey($key) {
-    return Tinify::setKey($key);
+    Tinify::setKey($key);
 }
 
 function setAppIdentifier($appIdentifier) {
-    return Tinify::setAppIdentifier($appIdentifier);
+    Tinify::setAppIdentifier($appIdentifier);
 }
 
 function setProxy($proxy) {
-    return Tinify::setProxy($proxy);
+    Tinify::setProxy($proxy);
 }
 
 function getCompressionCount() {
