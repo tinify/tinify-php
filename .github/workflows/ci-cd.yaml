@@ -20,7 +20,7 @@ jobs:
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: shivammathur/setup-php@2.32.0
+      - uses: shivammathur/setup-php@2.37.2
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer:v2
@@ -45,7 +45,7 @@ jobs:
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: shivammathur/setup-php@2.32.0
+      - uses: shivammathur/setup-php@2.37.2
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer:v2
