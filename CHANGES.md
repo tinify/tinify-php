@@ -1,3 +1,7 @@
+## Unreleased
+
+* Added `Format` constants for the media types `convert` accepts, including JPEG XL (`image/jxl`).
+
 ## 1.6.4
 * Will use POST instead of GET when retrieving result.
 * Remove deprecated `curl_close` for PHP version 8. https://www.php.net/manual/en/function.curl-close.php.
