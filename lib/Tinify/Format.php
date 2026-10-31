@@ -26,7 +26,12 @@ final class Format {
     /** JPEG. */
     const JPEG = "image/jpeg";
 
-    /** JPEG, an alias of self::JPEG. */
+    /**
+     * JPEG, under the alternative `image/jpg` media type the API also
+     * accepts. The API normalises this to `image/jpeg`, so the result is
+     * identical to self::JPEG. The two constants hold different strings
+     * but select the same format.
+     */
     const JPG = "image/jpg";
 
     /** AVIF. */
