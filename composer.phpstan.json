@@ -4,6 +4,6 @@
     "vendor-dir": "vendor-phpstan"
   },
   "require": {
-    "phpstan/phpstan": "^2.1"
+    "phpstan/phpstan": "2.3.4"
   }
 }

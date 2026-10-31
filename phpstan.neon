@@ -3,3 +3,17 @@ parameters:
     level: 5
     paths:
         - lib
+    ignoreErrors:
+        # Client::request retries by decrementing $retries and every path
+        # through the loop body returns, continues or throws. A continue only
+        # happens while $retries > 0, so at the condition check $retries is
+        # always 0 or 1 and the bound is never what ends the loop. Both of the
+        # findings below follow from that and are deliberate: the bound states
+        # the retry budget, and the trailing throw guards against a future edit
+        # introducing a path that falls out of the loop.
+        -
+            identifier: greaterOrEqual.alwaysTrue
+            path: lib/Tinify/Client.php
+        -
+            identifier: deadCode.unreachable
+            path: lib/Tinify/Client.php
