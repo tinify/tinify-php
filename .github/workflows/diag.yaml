@@ -6,35 +6,40 @@ on: [pull_request]
 permissions: {}
 
 jobs:
-  memory:
+  shell_test:
     runs-on: windows-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - label: "A-production-ini-default-memory"
-            ini: ""
-          - label: "B-unlimited-memory"
-            ini: "memory_limit=-1"
-          - label: "C-512M"
-            ini: "memory_limit=512M"
-    name: ${{ matrix.label }}
+        php-version: ["5.4", "5.6"]
+    name: shell-${{ matrix.php-version }}
     steps:
       - uses: shivammathur/setup-php@2.32.0
         with:
-          php-version: "5.4"
+          php-version: ${{ matrix.php-version }}
           tools: composer:2.2
-          ini-values: ${{ matrix.ini }}
       - uses: actions/checkout@v3
-      - name: Report effective memory_limit
+
+      - name: A. composer install under DEFAULT shell (pwsh on Windows)
+        continue-on-error: true
+        run: composer install --no-ansi --no-interaction --no-progress
+
+      - name: Clean between attempts
         shell: bash
-        run: php -r 'echo "memory_limit=", ini_get("memory_limit"), PHP_EOL;'
-      - name: composer install, capture exit code
+        run: rm -rf vendor composer.lock
+
+      - name: B. composer install under bash
+        continue-on-error: true
+        shell: bash
+        run: composer install --no-ansi --no-interaction --no-progress
+
+      - name: C. does composer write to stderr on this PHP?
         shell: bash
         run: |
+          rm -rf vendor composer.lock
           set +e
-          composer install --no-ansi --no-interaction --no-progress > out.txt 2> err.txt
-          echo "COMPOSER EXIT=$?"
-          echo "--- stdout ---"; tail -8 out.txt
-          echo "--- stderr ---"; tail -8 err.txt
+          composer install --no-ansi --no-interaction --no-progress 2> stderr_only.txt 1> stdout_only.txt
+          echo "exit=$?"
+          echo "--- stderr bytes: $(wc -c < stderr_only.txt) ---"
+          cat stderr_only.txt | head -10
