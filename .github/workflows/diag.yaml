@@ -20,6 +20,8 @@ jobs:
           tools: composer:2.2
           ini-values: display_errors=On, error_reporting=-1, memory_limit=-1
 
+      - uses: actions/checkout@v3
+
       - name: Runtime shape
         shell: bash
         run: |
@@ -48,6 +50,14 @@ jobs:
           set +e
           php f.php
           echo "   exit=$?"
+
+      - name: Does composer use curl or the streams fallback?
+        shell: bash
+        run: |
+          set +e
+          composer install --no-ansi --no-interaction --no-progress -vvv 2>&1 \
+            | grep -iE "curl|downloader|streams|tls|ssl error|handshake" | head -20
+          echo "   grep exit=$?"
 
       - name: composer install with stderr merged, full output
         shell: bash
