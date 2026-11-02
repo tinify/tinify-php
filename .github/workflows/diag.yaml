@@ -1,0 +1,29 @@
+---
+name: DIAG composer bisect
+
+on: [pull_request]
+
+permissions: {}
+
+jobs:
+  bisect:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        composer: ["2.2.22","2.2.23","2.2.24","2.2.25","2.2.26","2.2.27","2.2.28","2.2.29","2.2.30","2.2.31"]
+    name: c-${{ matrix.composer }}
+    steps:
+      - uses: shivammathur/setup-php@2.32.0
+        with:
+          php-version: "5.4"
+          tools: composer:${{ matrix.composer }}
+      - uses: actions/checkout@v3
+      - name: composer install
+        continue-on-error: true
+        run: composer install --no-ansi --no-interaction --no-progress
+      - name: Verdict
+        shell: bash
+        run: |
+          if [ -d vendor ]; then echo "VERDICT ${{ matrix.composer }} OK"; else echo "VERDICT ${{ matrix.composer }} BROKEN"; fi
