@@ -1,7 +1,24 @@
 ---
 name: PHP CI/CD
 
-on: [push, pull_request]
+# Pushing to a PR branch used to fire this workflow twice, once for `push`
+# and once for `pull_request`, with both runs created within seconds of each
+# other. Ten macOS jobs then invoked setup-php simultaneously and raced over
+# the shared runner tool cache, which is why identical commits produced
+# opposite results: one run's macOS jobs passed while the other's all failed
+# with "composer: command not found" after setup-php reported success.
+#
+# Restricting `push` to master means PR branches get exactly one run.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+# Belt and braces for rapid successive pushes to the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions: {}
 jobs:
@@ -49,7 +66,13 @@ jobs:
       - name: Run test suite
         run: vendor/bin/phpunit
   Integration_tests:
-    if: github.event_name == 'push'
+    # Previously `push` only, which covered PR branches because `push` fired
+    # for them. Now that `push` is master-only, the same coverage means master
+    # pushes plus same-repo pull requests. Fork PRs are excluded because they
+    # do not receive TINIFY_KEY and would fail on the missing secret.
+    if: >-
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     needs: Unit_tests
