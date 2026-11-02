@@ -33,7 +33,7 @@ jobs:
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
       - name: Install Dependencies
-        run: composer install --no-ansi --no-interaction --no-progress
+        run: composer install -vvv --no-ansi --no-interaction --no-progress 2>&1
       - name: Run test suite
         run: vendor/bin/phpunit
   Integration_tests:
