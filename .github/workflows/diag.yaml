@@ -6,40 +6,41 @@ on: [pull_request]
 permissions: {}
 
 jobs:
-  shell_test:
-    runs-on: windows-latest
-    timeout-minutes: 20
+  # Byte-for-byte the failing job, matrix trimmed to the one cell.
+  exact:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        php-version: ["5.4", "5.6"]
-    name: shell-${{ matrix.php-version }}
+        php-version: ["5.4"]
+        os: [windows-latest]
+    name: exact-replica
     steps:
       - uses: shivammathur/setup-php@2.32.0
         with:
           php-version: ${{ matrix.php-version }}
+          tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2' || 'composer:v2' }}
+      - uses: actions/checkout@v3
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress
+      - name: Run test suite
+        run: vendor/bin/phpunit
+
+  # Same, minus the validate step.
+  no_validate:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    name: no-validate-step
+    steps:
+      - uses: shivammathur/setup-php@2.32.0
+        with:
+          php-version: "5.4"
           tools: composer:2.2
       - uses: actions/checkout@v3
-
-      - name: A. composer install under DEFAULT shell (pwsh on Windows)
-        continue-on-error: true
+      - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-progress
-
-      - name: Clean between attempts
-        shell: bash
-        run: rm -rf vendor composer.lock
-
-      - name: B. composer install under bash
-        continue-on-error: true
-        shell: bash
-        run: composer install --no-ansi --no-interaction --no-progress
-
-      - name: C. does composer write to stderr on this PHP?
-        shell: bash
-        run: |
-          rm -rf vendor composer.lock
-          set +e
-          composer install --no-ansi --no-interaction --no-progress 2> stderr_only.txt 1> stdout_only.txt
-          echo "exit=$?"
-          echo "--- stderr bytes: $(wc -c < stderr_only.txt) ---"
-          cat stderr_only.txt | head -10
+      - name: Run test suite
+        run: vendor/bin/phpunit
