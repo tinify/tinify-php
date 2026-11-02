@@ -36,21 +36,6 @@ jobs:
           "8.5",
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        exclude:
-          # PHP 5.4 on Windows dies on its first TLS connection to packagist:
-          # composer -vvv reaches "Downloading https://repo.packagist.org/
-          # packages.json" and the process exits 1 with no output at all, even
-          # with display_errors=On and error_reporting=-1. The CA bundle is
-          # found and reported valid first, so this is not certificate
-          # discovery. PHP 5.4's bundled OpenSSL on Windows cannot negotiate
-          # with packagist's current TLS, and crashes rather than erroring.
-          # It passed in September; the runner moved, not this repo.
-          #
-          # Nothing in this repo can fix that, so the combination is dropped.
-          # PHP 5.4 stays covered on ubuntu and macOS, where it links the
-          # system OpenSSL and passes.
-          - php-version: "5.4"
-            os: windows-latest
     steps:
       - uses: shivammathur/setup-php@2.32.0
         with:
