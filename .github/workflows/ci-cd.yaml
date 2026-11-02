@@ -19,6 +19,21 @@ jobs:
           "8.5",
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
+        exclude:
+          # PHP 5.4 on Windows dies on its first TLS connection to packagist:
+          # composer -vvv reaches "Downloading https://repo.packagist.org/
+          # packages.json" and the process exits 1 with no output at all, even
+          # with display_errors=On and error_reporting=-1. The CA bundle is
+          # found and reported valid first, so this is not certificate
+          # discovery. PHP 5.4's bundled OpenSSL on Windows cannot negotiate
+          # with packagist's current TLS, and crashes rather than erroring.
+          # It passed in September; the runner moved, not this repo.
+          #
+          # Nothing in this repo can fix that, so the combination is dropped.
+          # PHP 5.4 stays covered on ubuntu and macOS, where it links the
+          # system OpenSSL and passes.
+          - php-version: "5.4"
+            os: windows-latest
     steps:
       - uses: shivammathur/setup-php@2.32.0
         with:
@@ -26,14 +41,11 @@ jobs:
           # composer 2.3 raised its floor to PHP 7.2.5, so the 5.x jobs need
           # the 2.2 LTS line. composer:v2 resolves to the newest 2.x.
           tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2' || 'composer:v2' }}
-          # TEMPORARY: setup-php's production ini sets display_errors=Off, which
-          # is why the 5.4 Windows crash prints nothing. Surface it.
-          ini-values: display_errors=On, error_reporting=-1
       - uses: actions/checkout@v3
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
       - name: Install Dependencies
-        run: composer install -vvv --no-ansi --no-interaction --no-progress 2>&1
+        run: composer install --no-ansi --no-interaction --no-progress
       - name: Run test suite
         run: vendor/bin/phpunit
   Integration_tests:
