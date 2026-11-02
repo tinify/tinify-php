@@ -1,0 +1,85 @@
+---
+name: DIAG win54 TLS
+
+on: [pull_request]
+
+permissions: {}
+
+jobs:
+  diagnose:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ["5.4", "5.6"]
+    steps:
+      - uses: shivammathur/setup-php@2.32.0
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:2.2
+          ini-values: display_errors=On, error_reporting=-1
+
+      - name: PHP and OpenSSL build info
+        shell: bash
+        run: |
+          php -v
+          php -r 'echo "OPENSSL_VERSION_TEXT: ", defined("OPENSSL_VERSION_TEXT") ? OPENSSL_VERSION_TEXT : "n/a", PHP_EOL;'
+          php -r 'echo "curl: "; $v = curl_version(); echo $v["version"], " ssl=", $v["ssl_version"], PHP_EOL;'
+
+      - name: Which stream transports does this PHP have?
+        shell: bash
+        run: php -r 'echo implode(", ", stream_get_transports()), PHP_EOL;'
+
+      - name: What does the OS openssl negotiate with packagist?
+        shell: bash
+        run: |
+          openssl version || true
+          echo | openssl s_client -connect repo.packagist.org:443 -servername repo.packagist.org 2>&1 \
+            | grep -E "^\s*(Protocol|Cipher)|SSL handshake|verify return code" || true
+
+      - name: PHP stream TLS attempt, per transport
+        shell: bash
+        run: |
+          cat > t.php <<'PHP'
+          <?php
+          $t = $argv[1];
+          $ctx = stream_context_create(array("ssl" => array(
+              "verify_peer" => false, "verify_peer_name" => false)));
+          $fp = @stream_socket_client("$t://repo.packagist.org:443",
+              $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $ctx);
+          echo $t, " => ", ($fp ? "CONNECTED" : "FAILED errno=$errno errstr=$errstr"), PHP_EOL;
+          if ($fp) { fclose($fp); }
+          PHP
+          for T in ssl tls sslv3 tlsv1.0 tlsv1.1 tlsv1.2; do
+            set +e
+            php t.php "$T"
+            echo "   exit=$?"
+            set -e
+          done
+
+      - name: PHP curl attempt (what composer 2.2 actually uses)
+        shell: bash
+        run: |
+          cat > c.php <<'PHP'
+          <?php
+          $ch = curl_init("https://repo.packagist.org/packages.json");
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($ch, CURLOPT_NOBODY, true);
+          $r = curl_exec($ch);
+          if ($r === false) {
+              echo "CURL FAILED: errno=", curl_errno($ch), " ", curl_error($ch), PHP_EOL;
+          } else {
+              echo "CURL OK http=", curl_getinfo($ch, CURLINFO_HTTP_CODE), PHP_EOL;
+          }
+          PHP
+          set +e
+          php c.php
+          echo "   exit=$?"
+
+      - name: Raw composer attempt, exit code captured
+        shell: bash
+        run: |
+          set +e
+          composer diagnose 2>&1 | head -25
+          echo "   composer diagnose exit=$?"
