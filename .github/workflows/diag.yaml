@@ -6,64 +6,35 @@ on: [pull_request]
 permissions: {}
 
 jobs:
-  diagnose:
+  memory:
     runs-on: windows-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        php-version: ["5.4", "5.6"]
+        include:
+          - label: "A-production-ini-default-memory"
+            ini: ""
+          - label: "B-unlimited-memory"
+            ini: "memory_limit=-1"
+          - label: "C-512M"
+            ini: "memory_limit=512M"
+    name: ${{ matrix.label }}
     steps:
       - uses: shivammathur/setup-php@2.32.0
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: "5.4"
           tools: composer:2.2
-          ini-values: display_errors=On, error_reporting=-1, memory_limit=-1
-
+          ini-values: ${{ matrix.ini }}
       - uses: actions/checkout@v3
-
-      - name: Runtime shape
+      - name: Report effective memory_limit
         shell: bash
-        run: |
-          php -r 'echo "PHP_INT_SIZE=", PHP_INT_SIZE, " (4=32bit, 8=64bit)", PHP_EOL;'
-          php -r 'echo "memory_limit=", ini_get("memory_limit"), PHP_EOL;'
-          php -r 'echo "php.ini=", php_ini_loaded_file(), PHP_EOL;'
-
-      - name: Fetch packages.json with curl and parse it
-        shell: bash
-        run: |
-          cat > f.php <<'PHP'
-          <?php
-          $ch = curl_init("https://repo.packagist.org/packages.json");
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($ch, CURLOPT_ENCODING, "");
-          $body = curl_exec($ch);
-          if ($body === false) {
-              echo "CURL FAILED: ", curl_error($ch), PHP_EOL; exit(1);
-          }
-          echo "downloaded bytes=", strlen($body), PHP_EOL;
-          echo "mem after download=", memory_get_usage(true), PHP_EOL;
-          $d = json_decode($body, true);
-          echo "json_decode=", ($d === null ? "NULL err=" . json_last_error() : "OK keys=" . count($d)), PHP_EOL;
-          echo "mem after decode=", memory_get_usage(true), PHP_EOL;
-          PHP
-          set +e
-          php f.php
-          echo "   exit=$?"
-
-      - name: Does composer use curl or the streams fallback?
+        run: php -r 'echo "memory_limit=", ini_get("memory_limit"), PHP_EOL;'
+      - name: composer install, capture exit code
         shell: bash
         run: |
           set +e
-          composer install --no-ansi --no-interaction --no-progress -vvv 2>&1 \
-            | grep -iE "curl|downloader|streams|tls|ssl error|handshake" | head -20
-          echo "   grep exit=$?"
-
-      - name: composer install with stderr merged, full output
-        shell: bash
-        run: |
-          set +e
-          composer install --no-ansi --no-interaction --no-progress -vvv > out.txt 2> err.txt
-          echo "   composer exit=$?"
-          echo "----- stdout tail -----"; tail -20 out.txt
-          echo "----- stderr tail -----"; tail -40 err.txt
+          composer install --no-ansi --no-interaction --no-progress > out.txt 2> err.txt
+          echo "COMPOSER EXIT=$?"
+          echo "--- stdout ---"; tail -8 out.txt
+          echo "--- stderr ---"; tail -8 err.txt
