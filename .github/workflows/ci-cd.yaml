@@ -41,13 +41,15 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           # composer 2.3 raised its floor to PHP 7.2.5, so the 5.x jobs need the
-          # 2.2 LTS line. Pin it exactly: composer 2.2.31, released 2026-10-29,
-          # breaks `composer install` on PHP 5.4 under Windows -- it exits 1
-          # having printed nothing and without creating vendor/. 2.2.21 and
-          # 2.2.9 are both fine, so this is a regression inside the 2.2 line
-          # rather than anything about this project. `composer:2.2` resolves to
-          # the newest 2.2.x and so picks up the broken one.
-          tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2.21' || 'composer:v2' }}
+          # 2.2 LTS line, and `composer:2.2` resolves to its newest release.
+          # That is 2.2.31, released 2026-10-29, which breaks `composer install`
+          # on PHP 5.4 under Windows: it exits 1 having printed nothing and
+          # without creating vendor/. Bisected across the whole range -- 2.2.22
+          # through 2.2.30 all work and only 2.2.31 fails -- so pin 2.2.30, the
+          # highest good release. Every composer security advisory in this line
+          # is fixed at 2.2.24 or earlier, so nothing is given up by pinning
+          # here. Revisit when a 2.2.32 ships.
+          tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2.30' || 'composer:v2' }}
       - uses: actions/checkout@v3
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
