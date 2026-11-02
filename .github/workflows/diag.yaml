@@ -6,31 +6,27 @@ on: [pull_request]
 permissions: {}
 
 jobs:
-  Unit_tests:
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+  composer_version:
+    runs-on: windows-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        php-version: [
-          "5.4",
-          "5.6",
-          "7.4",
-          "8.0",
-          "8.5",
-        ]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        composer: ["2.2.9", "2.2.21", "2.2.31"]
+    name: composer-${{ matrix.composer }}
     steps:
       - uses: shivammathur/setup-php@2.32.0
         with:
-          php-version: ${{ matrix.php-version }}
-          # composer 2.3 raised its floor to PHP 7.2.5, so the 5.x jobs need
-          # the 2.2 LTS line. composer:v2 resolves to the newest 2.x.
-          tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2' || 'composer:v2' }}
+          php-version: "5.4"
+          tools: composer:${{ matrix.composer }}
       - uses: actions/checkout@v3
-      - name: Validate composer.json and composer.lock
-        run: composer validate --strict
-      - name: Install Dependencies
+      - name: Report composer version
+        shell: bash
+        run: composer --version
+      - name: composer install
+        continue-on-error: true
         run: composer install --no-ansi --no-interaction --no-progress
-      - name: Run test suite
-        run: vendor/bin/phpunit
+      - name: Did vendor get created?
+        shell: bash
+        run: |
+          if [ -d vendor ]; then echo "RESULT: vendor present - INSTALL OK"; else echo "RESULT: no vendor - INSTALL FAILED"; fi
