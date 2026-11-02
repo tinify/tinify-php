@@ -26,6 +26,9 @@ jobs:
           # composer 2.3 raised its floor to PHP 7.2.5, so the 5.x jobs need
           # the 2.2 LTS line. composer:v2 resolves to the newest 2.x.
           tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2' || 'composer:v2' }}
+          # TEMPORARY: setup-php's production ini sets display_errors=Off, which
+          # is why the 5.4 Windows crash prints nothing. Surface it.
+          ini-values: display_errors=On, error_reporting=-1
       - uses: actions/checkout@v3
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
