@@ -36,35 +36,26 @@ jobs:
           "8.5",
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-    env:
-      # PHP 5.4 on Windows cannot complete a TLS handshake with packagist and
-      # crashes rather than erroring, so composer cannot fetch anything there.
-      # For that one cell, dependencies are resolved and downloaded under a
-      # modern PHP -- with composer told to solve for 5.4 via config.platform
-      # -- and only the test run happens under 5.4 itself.
-      CROSS_RESOLVE: ${{ matrix.php-version == '5.4' && matrix.os == 'windows-latest' }}
     steps:
       - uses: shivammathur/setup-php@2.32.0
         with:
-          php-version: ${{ (matrix.php-version == '5.4' && matrix.os == 'windows-latest') && '8.3' || matrix.php-version }}
-          # composer 2.3 raised its floor to PHP 7.2.5, so the 5.x jobs need
-          # the 2.2 LTS line. composer:v2 resolves to the newest 2.x.
-          tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2' || 'composer:v2' }}
+          php-version: ${{ matrix.php-version }}
+          # composer 2.3 raised its floor to PHP 7.2.5, so the 5.x jobs need the
+          # 2.2 LTS line. Pin it exactly: composer 2.2.31, released 2026-10-29,
+          # breaks `composer install` on PHP 5.4 under Windows -- it exits 1
+          # having printed nothing and without creating vendor/. 2.2.21 and
+          # 2.2.9 are both fine, so this is a regression inside the 2.2 line
+          # rather than anything about this project. `composer:2.2` resolves to
+          # the newest 2.2.x and so picks up the broken one.
+          tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2.21' || 'composer:v2' }}
       - uses: actions/checkout@v3
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
-      - name: Target PHP 5.4 when resolving under a newer runtime
-        if: env.CROSS_RESOLVE == 'true'
-        run: composer config platform.php 5.4.45
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-progress
-      - name: Switch to the PHP under test
-        if: env.CROSS_RESOLVE == 'true'
-        uses: shivammathur/setup-php@2.32.0
-        with:
-          php-version: ${{ matrix.php-version }}
-      - name: Confirm the runtime is the one under test
-        run: php -r 'echo PHP_VERSION, PHP_EOL;'
+      - name: Fail if dependencies did not actually install
+        shell: bash
+        run: test -d vendor || { echo "composer install produced no vendor/"; exit 1; }
       - name: Run test suite
         run: vendor/bin/phpunit
   Integration_tests:
