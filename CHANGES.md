@@ -1,4 +1,4 @@
-## Unreleased
+## 1.7.0
 
 * Added `Format` constants for the media types `convert` accepts, including JPEG XL (`image/jxl`).
 
