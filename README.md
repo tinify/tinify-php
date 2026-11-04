@@ -42,6 +42,28 @@ Tinify\setKey("YOUR_API_KEY");
 Tinify\fromFile("unoptimized.png")->toFile("optimized.png");
 ```
 
+Convert to another format with the `Tinify\Format` constants (`WEBP`, `PNG`,
+`JPEG`, `JPG`, `AVIF`, `JXL` and `ANY`):
+
+```php
+Tinify\fromFile("unoptimized.png")
+    ->convert(array("type" => Tinify\Format::JXL))
+    ->toFile("optimized.jxl");
+```
+
+Pass several and the API returns the smallest result:
+
+```php
+$converted = Tinify\fromFile("unoptimized.png")
+    ->convert(array("type" => array(Tinify\Format::JXL, Tinify\Format::WEBP)));
+
+$result = $converted->result();
+echo $result->mediaType(); // the format the API picked
+$result->toFile("optimized");
+```
+
+The constants are plain strings, so `"type" => "image/jxl"` keeps working.
+
 ## Running tests
 
 ```
