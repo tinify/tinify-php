@@ -32,15 +32,6 @@ class Client {
     }
 
     /**
-     * Path the the certificates
-     *
-     * @return string
-     */
-    private static function caBundle() {
-        return __DIR__ . "/../data/cacert.pem";
-    }
-
-    /**
      * Constructor for client
      * validates if curl meets requirements,
      *
@@ -72,7 +63,6 @@ class Client {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
             CURLOPT_USERPWD => "api:" . $key,
-            CURLOPT_CAINFO => self::caBundle(),
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_USERAGENT => join(" ", array_filter(array(self::userAgent(), $app_identifier))),
             CURLOPT_SSLVERSION => $tlsVersion,
