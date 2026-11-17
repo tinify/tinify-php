@@ -2,7 +2,7 @@
 
 namespace Tinify;
 
-const VERSION = "1.7.1";
+const VERSION = "2.0.0";
 
 class Tinify {
     /**
