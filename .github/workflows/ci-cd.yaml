@@ -50,7 +50,7 @@ jobs:
           # is fixed at 2.2.24 or earlier, so nothing is given up by pinning
           # here. Revisit when a 2.2.32 ships.
           tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2.30' || 'composer:v2' }}
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
       - name: Install Dependencies
@@ -84,7 +84,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer:v2
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-progress
       - name: Run test suite
