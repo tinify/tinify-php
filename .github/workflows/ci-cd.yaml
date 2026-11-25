@@ -37,7 +37,7 @@ jobs:
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: shivammathur/setup-php@2.37.2
+      - uses: shivammathur/setup-php@2.40.0
         with:
           php-version: ${{ matrix.php-version }}
           # composer 2.3 raised its floor to PHP 7.2.5, so the 5.x jobs need the
@@ -80,7 +80,7 @@ jobs:
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: shivammathur/setup-php@2.37.2
+      - uses: shivammathur/setup-php@2.40.0
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer:v2
