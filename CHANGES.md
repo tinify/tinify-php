@@ -1,3 +1,7 @@
+## Unreleased
+
+* Updated the bundled CA certificates to Mozilla's set of 5 November 2026, leaving out the eMudhra (emSign) roots.
+
 ## 1.6.4
 * Will use POST instead of GET when retrieving result.
 * Remove deprecated `curl_close` for PHP version 8. https://www.php.net/manual/en/function.curl-close.php.
