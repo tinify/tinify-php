@@ -1,3 +1,7 @@
+## 2.0.0
+
+* **Breaking:** Removed the bundled CA certificate bundle (`lib/data/cacert.pem`) and the `update-cacert.sh` script. The client now verifies the TLS connection against the system's CA store, as configured for curl/OpenSSL or through the `curl.cainfo` / `openssl.cafile` settings in `php.ini`. Environments without a configured CA store, which is common with PHP on Windows, must set `curl.cainfo` to a CA bundle.
+
 ## 1.7.1
 
 * Updated the bundled CA certificates to Mozilla's set of 5 November 2026, leaving out the eMudhra (emSign) roots.
