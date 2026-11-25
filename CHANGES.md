@@ -1,3 +1,7 @@
+## Unreleased
+
+* Updated the bundled CA certificates to Mozilla's set of 5 November 2026, leaving out the eMudhra (emSign) roots.
+
 ## 1.7.0
 
 * Added `Format` constants for the media types `convert` accepts, including JPEG XL (`image/jxl`).
