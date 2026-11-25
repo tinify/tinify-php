@@ -37,7 +37,7 @@ jobs:
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: shivammathur/setup-php@2.40.0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: ${{ matrix.php-version }}
           # composer 2.3 raised its floor to PHP 7.2.5, so the 5.x jobs need the
@@ -50,7 +50,7 @@ jobs:
           # is fixed at 2.2.24 or earlier, so nothing is given up by pinning
           # here. Revisit when a 2.2.32 ships.
           tools: ${{ startsWith(matrix.php-version, '5.') && 'composer:2.2.30' || 'composer:v2' }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
       - name: Install Dependencies
@@ -80,11 +80,11 @@ jobs:
         ]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: shivammathur/setup-php@2.40.0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer:v2
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-progress
       - name: Run test suite
