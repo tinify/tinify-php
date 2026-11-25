@@ -1,4 +1,4 @@
-## Unreleased
+## 1.7.1
 
 * Updated the bundled CA certificates to Mozilla's set of 5 November 2026, leaving out the eMudhra (emSign) roots.
 
